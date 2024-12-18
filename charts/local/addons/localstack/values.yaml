@@ -1,16 +1,25 @@
 replicaCount: 1
 ingress:
   enabled: true
-  annotations: {}
-  ## @param ingress.ingressClassName Set the name of the class to use
-  ##
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "localstack.lokal.blast.co.id"
+    external-dns.alpha.kubernetes.io/ttl: "300"
+    external-dns.alpha.kubernetes.io/target: "127.0.0.1"
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-grey"
   ingressClassName: "nginx"
   hosts:
-    - host: chart-example.local
+    - host: localstack.lokal.blast.co.id
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  tls:
+    - secretName: localstack-server-tls
+      hosts:
+        - localstack.lokal.blast.co.id
+
+extraEnvVars:
+  - name: DEFAULT_REGION
+    value: "ap-southeast-1"
+  - name: SERVICES
+    value: "dynamodb,s3"
