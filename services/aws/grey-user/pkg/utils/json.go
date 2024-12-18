@@ -1,4 +1,4 @@
-// Path: services/aws/grey-user/pkg/utils/json.go
+// Path: grey-user/pkg/utils/json.go
 
 package utils
 

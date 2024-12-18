@@ -1,12 +1,12 @@
-// Path: services/aws/grey-user/internal/app/model/user.go
+// Path: grey-user/internal/app/model/user.go
 
 package service
 
 import (
 	"context"
-	"services/aws/grey-user/internal/app"
-	"services/aws/grey-user/internal/app/model"
-	"services/aws/grey-user/internal/app/repository"
+	"grey-user/internal/app"
+	"grey-user/internal/app/model"
+	"grey-user/internal/app/repository"
 	"time"
 )
 

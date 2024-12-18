@@ -1,4 +1,4 @@
-// Path: services/aws/grey-user/internal/middleware/cors.go
+// Path: grey-user/internal/middleware/cors.go
 package middleware
 
 import (

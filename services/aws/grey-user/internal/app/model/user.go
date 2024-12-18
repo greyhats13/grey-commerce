@@ -1,4 +1,4 @@
-//Path: services/aws/grey-user/internal/app/model/user.go
+//Path: grey-user/internal/app/model/user.go
 
 package model
 

@@ -1,4 +1,4 @@
-// Path: services/aws/grey-user/internal/app/errors.go
+// Path: grey-user/internal/app/errors.go
 
 package app
 

@@ -1,16 +1,16 @@
-// Path: services/aws/grey-user/cmd/main.go
+// Path: grey-user/cmd/main.go
 
 package main
 
 import (
 	"log"
 
-	"services/aws/grey-user/internal/config"
-	"services/aws/grey-user/internal/middleware"
-	"services/aws/grey-user/internal/router"
-	"services/aws/grey-user/pkg/database/dynamodb"
-	"services/aws/grey-user/pkg/database/redis"
-	"services/aws/grey-user/pkg/logger"
+	"grey-user/internal/config"
+	"grey-user/internal/middleware"
+	"grey-user/internal/router"
+	"grey-user/pkg/database/dynamodb"
+	"grey-user/pkg/database/redis"
+	"grey-user/pkg/logger"
 
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"

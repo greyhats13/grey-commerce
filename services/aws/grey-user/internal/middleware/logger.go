@@ -1,9 +1,9 @@
-// Path: services/aws/grey-user/internal/middleware/logger.go
+// Path: grey-user/internal/middleware/logger.go
 
 package middleware
 
 import (
-	"services/aws/grey-user/pkg/logger"
+	"grey-user/pkg/logger"
 	"time"
 
 	"github.com/gofiber/fiber/v2"

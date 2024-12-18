@@ -1,4 +1,4 @@
-// Path: services/aws/grey-user/internal/middleware/error_handler.go
+// Path: grey-user/internal/middleware/error_handler.go
 package middleware
 
 import "github.com/gofiber/fiber/v2"

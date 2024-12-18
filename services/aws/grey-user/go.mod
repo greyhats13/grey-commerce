@@ -1,6 +1,6 @@
-// Path: services/aws/grey-user/go.mod
+// Path: grey-user/go.mod
 
-module services/aws/grey-user
+module grey-user
 
 go 1.23.4
 

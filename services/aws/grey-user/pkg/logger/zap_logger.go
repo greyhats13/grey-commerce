@@ -1,4 +1,4 @@
-// Path: services/aws/grey-user/pkg/logger/zap_logger.go
+// Path: grey-user/pkg/logger/zap_logger.go
 
 package logger
 

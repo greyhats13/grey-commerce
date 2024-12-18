@@ -1,7 +1,7 @@
 package dynamodb
 
 import (
-	"services/aws/grey-user/internal/config"
+	"grey-user/internal/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"

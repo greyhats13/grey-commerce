@@ -1,14 +1,14 @@
-// Path: services/aws/grey-user/internal/router/router.go
+// Path: grey-user/internal/router/router.go
 
 package router
 
 import (
-	"services/aws/grey-user/internal/app/handler"
-	"services/aws/grey-user/internal/app/repository"
-	"services/aws/grey-user/internal/app/service"
-	"services/aws/grey-user/internal/config"
-	"services/aws/grey-user/pkg/database/dynamodb"
-	"services/aws/grey-user/pkg/logger"
+	"grey-user/internal/app/handler"
+	"grey-user/internal/app/repository"
+	"grey-user/internal/app/service"
+	"grey-user/internal/config"
+	"grey-user/pkg/database/dynamodb"
+	"grey-user/pkg/logger"
 
 	// Import the redis client from github.com/redis/go-redis/v9
 	"github.com/redis/go-redis/v9"

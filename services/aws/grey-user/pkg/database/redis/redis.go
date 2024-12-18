@@ -1,10 +1,10 @@
-// Path: services/aws/grey-user/pkg/database/redis/redis.go
+// Path: grey-user/pkg/database/redis/redis.go
 
 package redis
 
 import (
 	"context"
-	"services/aws/grey-user/internal/config"
+	"grey-user/internal/config"
 
 	"github.com/redis/go-redis/v9"
 )

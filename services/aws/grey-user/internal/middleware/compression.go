@@ -1,4 +1,4 @@
-// Path: services/aws/grey-user/internal/middleware/compression.go
+// Path: grey-user/internal/middleware/compression.go
 
 package middleware
 

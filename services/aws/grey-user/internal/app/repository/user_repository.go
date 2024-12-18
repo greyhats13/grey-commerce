@@ -1,11 +1,11 @@
-//Path: services/aws/grey-user/internal/app/repository/user_repository.go
+//Path: grey-user/internal/app/repository/user_repository.go
 
 package repository
 
 import (
 	"context"
-	"services/aws/grey-user/internal/app"
-	"services/aws/grey-user/internal/app/model"
+	"grey-user/internal/app"
+	"grey-user/internal/app/model"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"

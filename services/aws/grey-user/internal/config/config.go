@@ -1,4 +1,4 @@
-// Path: services/aws/grey-user/internal/config/config.go
+// Path: grey-user/internal/config/config.go
 
 package config
 

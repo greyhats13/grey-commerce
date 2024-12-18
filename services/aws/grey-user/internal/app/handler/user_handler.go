@@ -1,13 +1,13 @@
-// Path: services/aws/grey-user/internal/app/handler/user_handler.go
+// Path: grey-user/internal/app/handler/user_handler.go
 
 package handler
 
 import (
+	"grey-user/internal/app"
+	"grey-user/internal/app/model"
+	"grey-user/internal/app/service"
+	"grey-user/pkg/utils"
 	"net/http"
-	"services/aws/grey-user/internal/app"
-	"services/aws/grey-user/internal/app/model"
-	"services/aws/grey-user/internal/app/service"
-	"services/aws/grey-user/pkg/utils"
 	"strconv"
 	"time"
 
