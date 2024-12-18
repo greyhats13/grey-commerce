@@ -15,13 +15,13 @@ module "argocd_app" {
     source_origin_targetRevision           = "3.12.2"
     source_override_repoURL                = "git@github.com:${var.github_owner}/${var.github_repo}.git"
     source_override_targetRevision         = "main"
-    source_override_path                   = "charts/locals/addons/${local.addon_standard.Feature}/values.yaml"
+    source_override_path                   = "charts/local/addons/${local.addon_standard.Feature}/values.yaml"
     project                                = "default"
     destination_server                     = "https://kubernetes.default.svc"
     destination_namespace                  = "kube-system"
     syncPolicy_automated_prune             = true
     syncPolicy_automated_selfHeal          = true
     syncPolicy_syncOptions_CreateNamespace = true
-    certificate_path                       = "charts/locals/addons/${local.addon_standard.Feature}/manifest/certificate"
+    certificate_path                       = "charts/local/addons/${local.addon_standard.Feature}/manifest/certificate"
   }
 }
