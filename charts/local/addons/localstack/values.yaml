@@ -18,8 +18,6 @@ ingress:
       hosts:
         - localstack.lokal.blast.co.id
 
-extraEnvVars:
-  - name: SERVICES
-    value: "dynamodb,s3"
-
-startServices: "dynamodb,s3"
+# extraEnvVars:
+#   - name: SERVICES
+#     value: "dynamodb,s3"
