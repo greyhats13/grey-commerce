@@ -21,3 +21,5 @@ ingress:
 extraEnvVars:
   - name: SERVICES
     value: "dynamodb,s3"
+
+startServices: "dynamodb,s3"
