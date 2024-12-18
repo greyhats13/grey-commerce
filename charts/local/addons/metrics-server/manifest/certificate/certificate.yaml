@@ -16,6 +16,6 @@ spec:
   duration: 2160h
   renewBefore: 360h
   issuerRef:
-    name: selfsigned-phl
+    name: selfsigned-grey
     kind: ClusterIssuer
     group: cert-manager.io

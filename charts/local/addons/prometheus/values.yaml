@@ -8,7 +8,7 @@ server:
       external-dns.alpha.kubernetes.io/ttl: "300"
       external-dns.alpha.kubernetes.io/target: "127.0.0.1"
       kubernetes.io/tls-acme: "true"
-      cert-manager.io/cluster-issuer: "letsencrypt-phl"
+      cert-manager.io/cluster-issuer: "letsencrypt-grey"
     hosts:
       - prometheus.lokal.blast.co.id
     path: /

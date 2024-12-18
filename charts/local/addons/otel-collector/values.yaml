@@ -8,8 +8,8 @@ image:
 serviceAccount:
   create: true
   # annotations:
-  #   iam.gke.io/gcp-service-account: phl-dev-addon-otel-collector@phl-platform.iam.gserviceaccount.com
-  # name: phl-dev-addon-otel-collector
+  #   iam.gke.io/gcp-service-account: grey-dev-addon-otel-collector@grey-platform.iam.gserviceaccount.com
+  # name: grey-dev-addon-otel-collector
 
 alternateConfig:
   receivers:
@@ -27,7 +27,7 @@ alternateConfig:
 
   # exporters:
   #   googlecloud:
-  #     project: phl-platform
+  #     project: grey-platform
   #     trace:
   #       use_insecure: false
 

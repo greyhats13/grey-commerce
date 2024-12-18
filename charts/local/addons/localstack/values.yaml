@@ -1,0 +1,16 @@
+replicaCount: 1
+ingress:
+  enabled: true
+  annotations: {}
+  ## @param ingress.ingressClassName Set the name of the class to use
+  ##
+  ingressClassName: "nginx"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
