@@ -11,7 +11,7 @@ module "argocd_app" {
   extra_vars = {
     argocd_namespace                       = "argocd"
     source_origin_repoURL                  = "https://localstack.github.io/helm-charts"
-    source_origin_chart                    = "${local.addon_standard.Feature}-charts"
+    source_origin_chart                    = "${local.addon_standard.Feature}"
     source_origin_targetRevision           = "0.6.19"
     source_override_repoURL                = "git@github.com:${var.github_owner}/${var.github_repo}.git"
     source_override_targetRevision         = "main"

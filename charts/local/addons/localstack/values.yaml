@@ -19,7 +19,5 @@ ingress:
         - localstack.lokal.blast.co.id
 
 extraEnvVars:
-  - name: DEFAULT_REGION
-    value: "ap-southeast-1"
   - name: SERVICES
     value: "dynamodb,s3"
