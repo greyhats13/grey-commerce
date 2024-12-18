@@ -1,9 +1,10 @@
+// Path: services/aws/grey-user/internal/middleware/logger.go
+
 package middleware
 
 import (
+	"services/aws/grey-user/pkg/logger"
 	"time"
-
-	"github.com/greyhats13/services/aws/grey-user/pkg/logger"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"

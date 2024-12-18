@@ -1,48 +1,45 @@
+// Path: services/aws/grey-user/cmd/main.go
+
 package main
 
 import (
 	"log"
 
-	"github.com/greyhats13/services/aws/grey-user/internal/config"
-	"github.com/greyhats13/services/aws/grey-user/internal/middleware"
-	"github.com/greyhats13/services/aws/grey-user/internal/router"
-	"github.com/greyhats13/services/aws/grey-user/pkg/database/dynamodb"
-	"github.com/greyhats13/services/aws/grey-user/pkg/database/redis"
-	"github.com/greyhats13/services/aws/grey-user/pkg/logger"
+	"services/aws/grey-user/internal/config"
+	"services/aws/grey-user/internal/middleware"
+	"services/aws/grey-user/internal/router"
+	"services/aws/grey-user/pkg/database/dynamodb"
+	"services/aws/grey-user/pkg/database/redis"
+	"services/aws/grey-user/pkg/logger"
 
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 func main() {
-	// Load config
-	cfg, err := config.LoadConfig(".env")
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	// Init logger
 	zapLogger, err := logger.NewZapLogger()
 	if err != nil {
 		log.Fatalf("failed to init logger: %v", err)
 	}
 
-	// Init DynamoDB
 	dynamoClient, err := dynamodb.NewDynamoDBClient(cfg)
 	if err != nil {
 		zapLogger.Fatal("failed to init dynamodb client", err)
 	}
 
-	// Init Redis
 	redisClient := redis.NewRedisClient(cfg)
 
 	app := fiber.New(fiber.Config{
-		// Using goccy/go-json for performance
-		JSONEncoder: goJSONMarshal,
-		JSONDecoder: goJSONUnmarshal,
+		JSONEncoder: json.Marshal,
+		JSONDecoder: json.Unmarshal,
 	})
 
-	// Middlewares
 	app.Use(middleware.RequestIDMiddleware())
 	app.Use(middleware.ZapLoggerMiddleware(zapLogger))
 	app.Use(middleware.ErrorHandler())
@@ -60,12 +57,4 @@ func main() {
 	if err := app.Listen(":" + port); err != nil {
 		zapLogger.Fatal("failed to start server", err)
 	}
-}
-
-func goJSONMarshal(v interface{}) ([]byte, error) {
-	return fiber.Marshal(v)
-}
-
-func goJSONUnmarshal(data []byte, v interface{}) error {
-	return fiber.Unmarshal(data, v)
 }

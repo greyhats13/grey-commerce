@@ -1,17 +1,18 @@
+// Path: services/aws/grey-user/internal/app/handler/user_handler.go
+
 package handler
 
 import (
 	"net/http"
+	"services/aws/grey-user/internal/app"
+	"services/aws/grey-user/internal/app/model"
+	"services/aws/grey-user/internal/app/service"
+	"services/aws/grey-user/pkg/utils"
 	"strconv"
 	"time"
 
-	"github.com/greyhats13/services/aws/grey-user/internal/app"
-	"github.com/greyhats13/services/aws/grey-user/internal/app/model"
-	"github.com/greyhats13/services/aws/grey-user/internal/app/service"
-	"github.com/greyhats13/services/aws/grey-user/pkg/utils"
-
-	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
 )
 
 type UserHandler struct {
@@ -64,9 +65,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusInternalServerError, "failed to update user")
 	}
 
-	// Invalidate cache
 	h.redisClient.Del(c.Context(), user.UUID)
-
 	return c.Status(http.StatusOK).JSON(user)
 }
 
@@ -94,7 +93,6 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusInternalServerError, "failed to get user")
 	}
 
-	// Set cache
 	b, _ := utils.JSONMarshal(user)
 	h.redisClient.Set(c.Context(), cacheKey, string(b), 5*time.Minute)
 
@@ -114,9 +112,7 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusInternalServerError, "failed to delete user")
 	}
 
-	// Invalidate cache
 	h.redisClient.Del(c.Context(), uuid)
-
 	return c.SendStatus(http.StatusNoContent)
 }
 

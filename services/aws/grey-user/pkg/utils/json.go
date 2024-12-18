@@ -1,3 +1,5 @@
+// Path: services/aws/grey-user/pkg/utils/json.go
+
 package utils
 
 import "github.com/goccy/go-json"

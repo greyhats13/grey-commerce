@@ -1,12 +1,13 @@
+// Path: services/aws/grey-user/internal/app/model/user.go
+
 package service
 
 import (
 	"context"
+	"services/aws/grey-user/internal/app"
+	"services/aws/grey-user/internal/app/model"
+	"services/aws/grey-user/internal/app/repository"
 	"time"
-
-	"github.com/greyhats13/services/aws/grey-user/internal/app"
-	"github.com/greyhats13/services/aws/grey-user/internal/app/model"
-	"github.com/greyhats13/services/aws/grey-user/internal/app/repository"
 )
 
 type UserService interface {
@@ -26,11 +27,9 @@ func NewUserService(repo repository.UserRepository) UserService {
 }
 
 func (s *userService) CreateUser(ctx context.Context, user *model.User) error {
-	// Basic validation
 	if user.ShopID == "" || user.Email == "" || user.Role == "" || user.Firstname == "" || user.Lastname == "" || user.Birthdate.IsZero() || user.Gender == "" || len(user.Addresses) == 0 || len(user.Phones) == 0 {
 		return app.ErrInvalidRequest
 	}
-
 	return s.repo.CreateUser(ctx, user)
 }
 
@@ -57,7 +56,6 @@ func (s *userService) UpdateUser(ctx context.Context, uuid string, updateReq map
 		user.Lastname = val.(string)
 	}
 	if val, ok := updateReq["birthdate"]; ok {
-		// birthdate should be a string in "2006-01-02" format or RFC3339
 		strVal := val.(string)
 		bd, err := time.Parse("2006-01-02", strVal)
 		if err != nil {
@@ -102,7 +100,6 @@ func (s *userService) ListUsers(ctx context.Context, limit int64, lastKey string
 	return s.repo.ListUsers(ctx, limit, lastKey)
 }
 
-// helper casting functions
 func toAddresses(val interface{}) []model.Address {
 	arr, ok := val.([]interface{})
 	if !ok {

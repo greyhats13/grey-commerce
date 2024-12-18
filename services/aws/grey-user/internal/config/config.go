@@ -1,38 +1,37 @@
+// Path: services/aws/grey-user/internal/config/config.go
+
 package config
 
 import (
-	"os"
-
-	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
-	AWSRegion          string
-	AWSAccessKeyID     string
-	AWSSecretAccessKey string
-	DynamoDBTable      string
-	RedisAddr          string
-	RedisPassword      string
-	RedisDB            int
-	Port               string
+	AWSRegion     string
+	DynamoDBTable string
+	RedisAddr     string
+	RedisPassword string
+	Port          string
 }
 
-func LoadConfig(path string) (*Config, error) {
-	err := godotenv.Load(path)
-	if err != nil {
-		// not fatal if .env is missing, env vars might be set on system
+func LoadConfig() (*Config, error) {
+	viper.SetConfigFile("config.yaml")
+	viper.AutomaticEnv()
+
+	// Defaults
+	viper.SetDefault("PORT", "8080")
+
+	if err := viper.ReadInConfig(); err != nil {
+		// It's okay if config file not found
 	}
 
-	redisDB := 0
+	cfg := &Config{
+		AWSRegion:     viper.GetString("AWS_REGION"),
+		DynamoDBTable: viper.GetString("DYNAMODB_TABLE"),
+		RedisAddr:     viper.GetString("REDIS_ADDR"),
+		RedisPassword: viper.GetString("REDIS_PASSWORD"),
+		Port:          viper.GetString("PORT"),
+	}
 
-	return &Config{
-		AWSRegion:          os.Getenv("AWS_REGION"),
-		AWSAccessKeyID:     os.Getenv("AWS_ACCESS_KEY_ID"),
-		AWSSecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
-		DynamoDBTable:      os.Getenv("DYNAMODB_TABLE"),
-		RedisAddr:          os.Getenv("REDIS_ADDR"),
-		RedisPassword:      os.Getenv("REDIS_PASSWORD"),
-		RedisDB:            redisDB,
-		Port:               os.Getenv("PORT"),
-	}, nil
+	return cfg, nil
 }

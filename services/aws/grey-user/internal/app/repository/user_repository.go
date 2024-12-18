@@ -1,15 +1,16 @@
+//Path: services/aws/grey-user/internal/app/repository/user_repository.go
+
 package repository
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"github.com/greyhats13/services/aws/grey-user/internal/app"
-	"github.com/greyhats13/services/aws/grey-user/internal/app/model"
+	"services/aws/grey-user/internal/app"
+	"services/aws/grey-user/internal/app/model"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/google/uuid"
 )
 
@@ -39,27 +40,23 @@ func (r *userRepository) CreateUser(ctx context.Context, user *model.User) error
 	user.CreatedAt = now
 	user.UpdatedAt = now
 
-	item, err := MarshalMap(user)
+	item, err := dynamodbattribute.MarshalMap(user)
 	if err != nil {
 		return err
 	}
 
 	_, err = r.db.PutItemWithContext(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(r.table),
-		Item:      item,
-		ConditionExpression: aws.String("attribute_not_exists(uuid)"), 
+		TableName:           aws.String(r.table),
+		Item:                item,
+		ConditionExpression: aws.String("attribute_not_exists(uuid)"),
 	})
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (r *userRepository) UpdateUser(ctx context.Context, user *model.User) error {
 	user.UpdatedAt = time.Now().UTC()
 
-	item, err := MarshalMap(user)
+	item, err := dynamodbattribute.MarshalMap(user)
 	if err != nil {
 		return err
 	}
@@ -87,8 +84,7 @@ func (r *userRepository) GetUser(ctx context.Context, userID string) (*model.Use
 	}
 
 	var user model.User
-	err = UnmarshalMap(out.Item, &user)
-	if err != nil {
+	if err := dynamodbattribute.UnmarshalMap(out.Item, &user); err != nil {
 		return nil, err
 	}
 
@@ -103,10 +99,7 @@ func (r *userRepository) DeleteUser(ctx context.Context, userID string) error {
 		},
 		ConditionExpression: aws.String("attribute_exists(uuid)"),
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (r *userRepository) ListUsers(ctx context.Context, limit int64, lastKey string) ([]model.User, string, error) {
@@ -126,8 +119,7 @@ func (r *userRepository) ListUsers(ctx context.Context, limit int64, lastKey str
 	}
 
 	users := []model.User{}
-	err = UnmarshalListOfMaps(out.Items, &users)
-	if err != nil {
+	if err := dynamodbattribute.UnmarshalListOfMaps(out.Items, &users); err != nil {
 		return nil, "", err
 	}
 
@@ -137,76 +129,4 @@ func (r *userRepository) ListUsers(ctx context.Context, limit int64, lastKey str
 	}
 
 	return users, nextKey, nil
-}
-
-// MarshalMap and Unmarshal helpers
-// For simplicity, use dynamodbattribute utilities
-func MarshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
-	av, err := dynamodbattributeMarshalMap(in)
-	if err != nil {
-		return nil, err
-	}
-	return av, nil
-}
-
-func UnmarshalMap(m map[string]*dynamodb.AttributeValue, out interface{}) error {
-	return dynamodbattributeUnmarshalMap(m, out)
-}
-
-func UnmarshalListOfMaps(l []map[string]*dynamodb.AttributeValue, out interface{}) error {
-	return dynamodbattributeUnmarshalListOfMaps(l, out)
-}
-
-// We define custom marshal/unmarshal to avoid placeholders
-// Using standard AWS SDK methods
-func dynamodbattributeMarshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
-	return dynamodbattribute{}.MarshalMap(in)
-}
-func dynamodbattributeUnmarshalMap(m map[string]*dynamodb.AttributeValue, out interface{}) error {
-	return dynamodbattribute{}.UnmarshalMap(m, out)
-}
-func dynamodbattributeUnmarshalListOfMaps(l []map[string]*dynamodb.AttributeValue, out interface{}) error {
-	return dynamodbattribute{}.UnmarshalListOfMaps(l, out)
-}
-
-// A mini wrapper to handle attribute conversions
-type dynamodbattribute struct{}
-
-func (d dynamodbattribute) MarshalMap(in interface{}) (map[string]*dynamodb.AttributeValue, error) {
-	ma, err := dynamodbattributeMarshal(in)
-	if err != nil {
-		return nil, err
-	}
-	m, ok := ma.(map[string]*dynamodb.AttributeValue)
-	if !ok {
-		return nil, fmt.Errorf("unexpected type")
-	}
-	return m, nil
-}
-
-func (d dynamodbattribute) UnmarshalMap(m map[string]*dynamodb.AttributeValue, out interface{}) error {
-	return dynamodbattributeUnmarshal(m, out)
-}
-
-func (d dynamodbattribute) UnmarshalListOfMaps(l []map[string]*dynamodb.AttributeValue, out interface{}) error {
-	return dynamodbattributeUnmarshal(l, out)
-}
-
-// Use dynamodbattribute from aws-sdk-go
-// We'll implement these using reflection from the sdk
-import "github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-
-func dynamodbattributeMarshal(in interface{}) (interface{}, error) {
-	return dynamodbattribute.MarshalMap(in)
-}
-
-func dynamodbattributeUnmarshal(av interface{}, out interface{}) error {
-	switch v := av.(type) {
-	case map[string]*dynamodb.AttributeValue:
-		return dynamodbattribute.UnmarshalMap(v, out)
-	case []map[string]*dynamodb.AttributeValue:
-		return dynamodbattribute.UnmarshalListOfMaps(v, out)
-	default:
-		return errors.New("unsupported attribute type")
-	}
 }

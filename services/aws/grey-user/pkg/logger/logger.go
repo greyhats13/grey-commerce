@@ -1,3 +1,5 @@
+// Path: services/aws/grey-user/pkg/logger/logger.go
+
 package logger
 
 type Field struct {
