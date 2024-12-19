@@ -35,3 +35,15 @@ resource "kubernetes_secret_v1" "external-dns" {
   }
   depends_on = [module.argocd_app]
 }
+
+resource "kubernetes_secret_v1" "cert-manager" {
+  metadata {
+    name      = "redis"
+    namespace = local.addon_standard.Feature
+  }
+
+  data = {
+    redis_password = var.cloudflare_api_key
+  }
+  depends_on = [module.argocd_app]
+}
