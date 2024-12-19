@@ -10,7 +10,7 @@ master:
 replica:
   persistence:
     enabled: false
-
+  replicaCount: 1
 sentinel:
   persistence:
     enabled: false
