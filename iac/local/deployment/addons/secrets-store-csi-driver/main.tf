@@ -10,9 +10,9 @@ module "argocd_app" {
   dns_name      = "${local.addon_standard.Feature}.${var.unit}.blast.co.id"
   extra_vars = {
     argocd_namespace                       = "argocd"
-    source_origin_repoURL                  = "https://secrets-store-community.github.io/helm-charts"
+    source_origin_repoURL                  = "https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts"
     source_origin_chart                    = local.addon_standard.Feature
-    source_origin_targetRevision           = "26.0.1"
+    source_origin_targetRevision           = "1.4.7"
     source_override_repoURL                = "git@github.com:${var.github_owner}/${var.github_repo}.git"
     source_override_targetRevision         = "main"
     source_override_path                   = "charts/local/addons/${local.addon_standard.Feature}/values.yaml"

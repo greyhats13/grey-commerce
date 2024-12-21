@@ -8,7 +8,7 @@ locals {
     Unit    = var.unit
     Env     = var.env
     Code    = "addon"
-    Feature = "secrets-store"
+    Feature = "secrets-store-csi-driver"
   }
   addon_naming_standard = "${local.addon_standard.Unit}-${local.addon_standard.Code}-${local.addon_standard.Feature}"
   addon_naming_full     = "${local.addon_standard.Unit}-${local.addon_standard.Env}-${local.addon_standard.Code}-${local.addon_standard.Feature}"
