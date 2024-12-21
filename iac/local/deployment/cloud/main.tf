@@ -28,6 +28,7 @@ module "secrets_iac" {
   ignore_secret_changes = true
   secret_string = jsonencode({
     argocd_ssh_base64 = base64encode(tls_private_key.argocd_ssh.private_key_pem)
+    REDIS_PASSWORD    = random_password.redis.result
   })
 
   tags = merge(local.tags, local.secrets_manager_standard)

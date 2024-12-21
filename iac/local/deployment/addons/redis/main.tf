@@ -32,14 +32,7 @@ resource "kubernetes_secret_v1" "redis" {
   }
 
   data = {
-    REDIS_PASSWORD = random_password.password.result
+    REDIS_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.redis.secret_string)["REDIS_PASSWORD"]
   }
   depends_on = [module.argocd_app]
-}
-
-resource "aws_secretsmanager_secret_version" "example" {
-  secret_id     = "grey/local/secretsmanager/iac"
-  secret_string = jsonencode({
-    REDIS_PASSWORD = random_password.password.result
-  })
 }
