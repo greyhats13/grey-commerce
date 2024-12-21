@@ -36,3 +36,10 @@ resource "kubernetes_secret_v1" "redis" {
   }
   depends_on = [module.argocd_app]
 }
+
+resource "aws_secretsmanager_secret_version" "example" {
+  secret_id     = "grey/local/secretsmanager/iac"
+  secret_string = jsonencode({
+    REDIS_PASSWORD = random_password.password.result
+  })
+}

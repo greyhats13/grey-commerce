@@ -6,6 +6,14 @@ locals {
     GithubRepo = var.github_repo
     GithubOrg  = var.github_owner
   }
+  # AWS Secrets Manager Locals
+  secrets_manager_standard = {
+    Unit    = var.unit
+    Env     = var.env
+    Code    = "secretsmanager"
+    Feature = "iac"
+  }
+  secrets_manager_naming_standard = "${local.secrets_manager_standard.Unit}/${local.secrets_manager_standard.Env}/${local.secrets_manager_standard.Code}/${local.secrets_manager_standard.Feature}"
   # ArgoCD Locals
   argocd_standard = {
     Unit    = var.unit

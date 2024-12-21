@@ -1,3 +1,38 @@
+# Secrets Manager
+module "secrets_iac" {
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "~> 1.3.1"
+
+  # Secret
+  name                    = local.secrets_manager_naming_standard
+  description             = "Secrets for ${local.secrets_manager_naming_standard}"
+  recovery_window_in_days = 0
+  # Policy
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    admin = {
+      sid = "IacSecretAdmin"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+        }
+      ]
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["*"]
+    }
+  }
+
+  # Version
+  ignore_secret_changes = true
+  secret_string = jsonencode({
+    argocd_ssh_base64 = base64encode(tls_private_key.argocd_ssh.private_key_pem)
+  })
+
+  tags = merge(local.tags, local.secrets_manager_standard)
+}
+
 # ArgoCD
 # ArgoCD is a declarative, GitOps continuous delivery tool for Kubernetes.
 module "argocd" {
@@ -41,3 +76,4 @@ module "github" {
     module.argocd,
   ]
 }
+

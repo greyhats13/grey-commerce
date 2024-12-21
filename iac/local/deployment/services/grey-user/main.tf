@@ -28,22 +28,18 @@ module "secrets_manager" {
   # Version
   ignore_secret_changes = true
   secret_string = jsonencode({
-    db_host     = data.terraform_remote_state.cloud.outputs.aurora_cluster_endpoint
-    db_port     = tostring(data.terraform_remote_state.cloud.outputs.aurora_cluster_port)
-    db_name     = mysql_database.db.name
-    db_user     = mysql_user.db.user
-    db_password = random_password.password.result
+    redis_password = "test"
   })
 
   tags = merge(local.tags, local.svc_standard)
 }
 
-# Prepare GIthub
-module "github_action_env" {
-  source                  = "../../../modules/github"
-  repo_name               = var.github_repo
-  owner                   = var.github_owner
-  svc_name                = local.svc_naming_standard
-  github_action_variables = local.github_action_variables
-  # github_action_secrets   = local.github_action_secrets
-}
+# # Prepare GIthub
+# module "github_action_env" {
+#   source                  = "../../../modules/github"
+#   repo_name               = var.github_repo
+#   owner                   = var.github_owner
+#   svc_name                = local.svc_naming_standard
+#   github_action_variables = local.github_action_variables
+#   # github_action_secrets   = local.github_action_secrets
+# }
