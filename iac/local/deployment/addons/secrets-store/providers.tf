@@ -1,7 +1,7 @@
 terraform {
   # backend "s3" {
   #   bucket = "grey-dev-s3-tfstate"
-  #   key    = "grey/deployment/cloud/grey-local-addon-prometheus.tfstate"
+  #   key    = "grey/deployment/cloud/grey-local-addon-secrets-store.tfstate"
   #   region = "ap-southeast-1"
   #   # profile = "grey-local"
   # }
