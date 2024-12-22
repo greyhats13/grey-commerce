@@ -56,7 +56,7 @@ module "argocd_app" {
     syncPolicy_automated_prune             = true
     syncPolicy_automated_selfHeal          = true
     syncPolicy_syncOptions_CreateNamespace = true
-    cluster_secret_store_path              = "charts/local/addons/${local.addon_standard.Feature}/manifest/${local.addon_standard.Feature}/${local.addon_standard.Feature}.yaml"
+    cluster_secret_store_path              = "charts/local/addons/${local.addon_standard.Feature}/manifest/cluster-secret-store/cluster-secret-store.yaml"
   }
 }
 
