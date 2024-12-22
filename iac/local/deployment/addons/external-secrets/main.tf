@@ -62,13 +62,16 @@ module "argocd_app" {
 
 resource "kubernetes_secret_v1" "secrets" {
   metadata {
-    name      = "aws-creds"
+    name      = "awssm-secret"
     namespace = local.addon_standard.Feature
   }
 
   data = {
-    access-key = "test"
-    secret-key = "test"
+    access-key                  = "test"
+    secret-access-key           = "test"
+    AWS_SECRETSMANAGER_ENDPOINT = "https://localstack.lokal.blast.co.id"
+    AWS_SSM_ENDPOINT            = "https://localstack.lokal.blast.co.id"
+    AWS_STS_ENDPOINT            = "https://localstack.lokal.blast.co.id"
   }
   depends_on = [module.argocd_app]
 }
