@@ -1,3 +1,37 @@
+module "iam_assumable_role_inline_policy" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  trusted_role_arns = [
+    "arn:aws:iam::000000000000:root",
+  ]
+
+  trusted_role_services = [
+    "ec2.amazonaws.com"
+  ]
+
+  create_role = true
+
+  role_name         = "external-secrets-role"
+  role_requires_mfa = false
+  inline_policy_statements = [
+    {
+      sid = "AllowECRPushPull"
+      actions = [
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:ListSecretVersionIds",
+        "secretsmanager:CreateSecret",
+        "secretsmanager:PutSecretValue",
+        "secretsmanager:TagResource",
+        "secretsmanager:DeleteSecret"
+      ]
+      effect    = "Allow"
+      resources = ["*"]
+    }
+  ]
+}
+
 module "argocd_app" {
   source        = "../../../modules/helm"
   region        = var.region
@@ -22,5 +56,19 @@ module "argocd_app" {
     syncPolicy_automated_prune             = true
     syncPolicy_automated_selfHeal          = true
     syncPolicy_syncOptions_CreateNamespace = true
+    cluster_secret_store_path              = "charts/local/addons/${local.addon_standard.Feature}/manifest/cluster-secret-store"
   }
+}
+
+resource "kubernetes_secret_v1" "secrets" {
+  metadata {
+    name      = "aws-creds"
+    namespace = local.addon_standard.Feature
+  }
+
+  data = {
+    access-key = "test"
+    secret-key = "test"
+  }
+  depends_on = [module.argocd_app]
 }
