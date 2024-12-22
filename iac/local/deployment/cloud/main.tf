@@ -53,7 +53,7 @@ module "argocd" {
     github_client_id = var.github_oauth_client_id
     ARGOCD_VERSION   = var.argocd_version
     AVP_VERSION      = var.argocd_vault_plugin_version
-    server_insecure  = true
+    server_insecure  = false
 
     # ref https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
     # ingress
@@ -76,20 +76,4 @@ module "github" {
   depends_on = [
     module.argocd,
   ]
-}
-
-resource "aws_dynamodb_table" "us-east-1" {
-  provider = aws.us-east-1
-
-  hash_key         = "myAttribute"
-  name             = "myTable"
-  stream_enabled   = true
-  stream_view_type = "NEW_AND_OLD_IMAGES"
-  read_capacity    = 1
-  write_capacity   = 1
-
-  attribute {
-    name = "myAttribute"
-    type = "S"
-  }
 }

@@ -44,7 +44,7 @@ module "argocd_app" {
   dns_name      = "${local.addon_standard.Feature}.${var.unit}.blast.co.id"
   extra_vars = {
     argocd_namespace                       = "argocd"
-    source_origin_repoURL                  = "https://kubernetes-sigs.github.io/external-secrets/charts"
+    source_origin_repoURL                  = "https://charts.external-secrets.io"
     source_origin_chart                    = local.addon_standard.Feature
     source_origin_targetRevision           = "0.11.0"
     source_override_repoURL                = "git@github.com:${var.github_owner}/${var.github_repo}.git"
@@ -56,7 +56,7 @@ module "argocd_app" {
     syncPolicy_automated_prune             = true
     syncPolicy_automated_selfHeal          = true
     syncPolicy_syncOptions_CreateNamespace = true
-    cluster_secret_store_path              = "charts/local/addons/${local.addon_standard.Feature}/manifest/cluster-secret-store"
+    cluster_secret_store_path              = "charts/local/addons/${local.addon_standard.Feature}/manifest/${local.addon_standard.Feature}/${local.addon_standard.Feature}.yaml"
   }
 }
 
