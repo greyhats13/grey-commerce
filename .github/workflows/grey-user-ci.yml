@@ -17,6 +17,7 @@ permissions:
   contents: read # This is required for actions/checkout
 jobs:
   build_push_tag:
+    environment: grey-svc-user
     name: Build, Push, Tag
     runs-on: ubuntu-latest
     # needs: test_and_coverages
@@ -109,7 +110,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
   deployment:
-    environment: grey-user
+    environment: grey-svc-user
     name: Deployment
     runs-on: ubuntu-latest
     needs: [build_push_tag]
