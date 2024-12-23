@@ -46,6 +46,13 @@ jobs:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.2.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.8.0
+        platforms: linux/amd64,linux/arm64
+        
       - name: Login to Amazon ECR
         # if not branch local
         if: ${{ github.ref != 'refs/heads/local' }}
@@ -92,7 +99,6 @@ jobs:
           tags: |
             ${{ vars.GH_OWNER }}/${{ vars.SVC_NAMING_STANDARD }}:${{ env.IMAGE_TAG_SHA }}
             ${{ vars.GH_OWNER }}/${{ vars.SVC_NAMING_STANDARD }}:${{ env.IMAGE_TAG_LATEST }}
-          platforms: linux/amd64,linux/arm64
 
       - name: Build, Tag, and Push
         uses: docker/build-push-action@v6.9.0
@@ -107,7 +113,6 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ vars.SVC_NAMING_STANDARD }}:${{ env.IMAGE_TAG_SHA }}
             ${{ env.REGISTRY }}/${{ vars.SVC_NAMING_STANDARD }}:${{ env.IMAGE_TAG_LATEST }}
-          platforms: linux/amd64,linux/arm64
 
   deployment:
     environment: grey-svc-user
