@@ -18,8 +18,9 @@ RUN go mod download
 # Copy the entire project
 COPY . .
 
-# Build the binary
-RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-s -w" -o grey-user ./cmd/main.go
+# Build multi-platform binary
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o grey-user ./cmd/main.go
+
 # Final stage
 FROM gcr.io/distroless/base-debian11
 WORKDIR /app

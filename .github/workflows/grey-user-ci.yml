@@ -62,27 +62,27 @@ jobs:
         id: set_image_tag
         run: |
           echo "GITHUB_REF: $GITHUB_REF"
-          # if the branch is dev, tag the image as incubator
+          # if the branch is local, tag the image as local
           if [[ $GITHUB_REF == refs/heads/local ]]; then
-            echo "image_tag_sha=incubator-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
-            echo "chart_path=${{ vars.GITOPS_PATH_LOCAL }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
-            echo "IMAGE_TAG_SHA=incubator-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
-            echo "IMAGE_TAG_LATEST=incubator-latest" >> $GITHUB_ENV
-            echo "CHART_PATH=${{ vars.GITOPS_PATH_LOCAL }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
+            echo "image_tag_sha=local-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
+            echo "chart_path=charts/${{ vars.GITOPS_PATH_LOCAL }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
+            echo "IMAGE_TAG_SHA=local-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+            echo "IMAGE_TAG_LATEST=local-latest" >> $GITHUB_ENV
+            echo "CHART_PATH=charts/${{ vars.GITOPS_PATH_LOCAL }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
           # if the branch is dev, tag the image as alpha
           elif [[ $GITHUB_REF == refs/heads/dev ]]; then
             echo "image_tag_sha=alpha-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
-            echo "chart_path=${{ vars.GITOPS_PATH_DEV }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
+            echo "chart_path=charts/${{ vars.GITOPS_PATH_DEV }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
             echo "IMAGE_TAG_SHA=alpha-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
             echo "IMAGE_TAG_LATEST=alpha-latest" >> $GITHUB_ENV
-            echo "CHART_PATH=${{ vars.GITOPS_PATH_DEV }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
+            echo "CHART_PATH=charts/${{ vars.GITOPS_PATH_DEV }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
           # if the branch is main, tag the image as beta
           elif [[ $GITHUB_REF == refs/heads/main ]]; then
             echo "image_tag_sha=beta-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
-            echo "chart_path=${{ vars.GITOPS_PATH_STG }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
+            echo "chart_path=charts/${{ vars.GITOPS_PATH_STG }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
             echo "IMAGE_TAG_LATEST=beta-latest" >> $GITHUB_ENV
             echo "IMAGE_TAG_SHA=beta-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
-            echo "CHART_PATH=${{ vars.GITOPS_PATH_STG }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
+            echo "CHART_PATH=charts/${{ vars.GITOPS_PATH_STG }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
           fi
 
       - name: Build, Tag, and Push
@@ -106,7 +106,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         with:
-          context: ./services/grey-user/
+          context: ./services/aws/grey-user/
           # Distroless
           # file: ./Dockerfile-distroless
           push: true
@@ -134,6 +134,7 @@ jobs:
           echo ${{ vars.GH_REPO_NAME }}/${{ needs.build_push_tag.outputs.chart_path }}
           cd ${{ vars.GH_REPO_NAME }}/${{ needs.build_push_tag.outputs.chart_path }}
           if [[ $GITHUB_REF == refs/heads/local ]]; then
+            git checkout local
             sed -i "s|repository: .*|repository: ${{ vars.GH_OWNER }}/${{ vars.SVC_NAMING_STANDARD }}|" values.yaml
           else
             sed -i "s|repository: .*|repository: ${{ needs.build_push_tag.outputs.registry }}/${{ vars.SVC_NAMING_STANDARD }}|" values.yaml
@@ -143,7 +144,11 @@ jobs:
           git config --global user.email "imam.arief.rhmn@gmail.com"
           git config --global user.name "greyhats13"
           git commit -m "Update image tag to ${{ needs.build_push_tag.outputs.image_tag_sha }}"
-          git push origin main
+          if [[ $GITHUB_REF == refs/heads/local ]]; then
+            git push origin local
+          else
+            git push origin main
+          fi
 
   # end_to_end_test:
   #   name: End to End Testing
