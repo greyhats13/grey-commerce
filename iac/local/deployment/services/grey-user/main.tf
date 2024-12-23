@@ -166,9 +166,9 @@ module "argocd_app" {
     argocd_namespace      = "argocd"
     source_repoURL        = "git@github.com:${var.github_owner}/${var.github_repo}.git"
     source_targetRevision = "HEAD"
-    source_path = var.env == "dev" ? "charts/app/incubator/${local.svc_name}" : (
-      var.env == "stg" ? "charts/app/test/${local.svc_name}" : (
-        var.env == "prod" ? "charts/app/stable/${local.svc_name}" : "charts/app/local/${local.svc_name}"
+    source_path = var.env == "dev" ? "charts/incubator/app/${local.svc_name}" : (
+      var.env == "stg" ? "charts/test/app/${local.svc_name}" : (
+        var.env == "prod" ? "charts/stable/app/${local.svc_name}" : "charts/local/app/${local.svc_name}"
       )
     )
     project                                = "default"
