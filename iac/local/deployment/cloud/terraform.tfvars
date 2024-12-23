@@ -1,6 +1,7 @@
 unit                        = "grey"
 env                         = "local"
 cloudflare_zone_id          = "54fa9effc64925e75126d042897d3d51"
+docker_username             = "greyhats13"
 region                      = "ap-southeast-1"
 github_repo                 = "grey-commerce"
 github_owner                = "greyhats13"

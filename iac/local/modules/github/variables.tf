@@ -72,9 +72,20 @@ variable "argocd_namespace" {
   default     = null
 }
 
+# Github action environments arguments
+variable "github_action_variables_env" {
+  description = "List of environment variables to be added to the repository github actions"
+  default     = {}
+}
+
+variable "github_action_secrets_env" {
+  description = "List of secrets to be added to the repository github actions environment"
+  default     = {}
+}
+
 # Github action arguments
 variable "github_action_variables" {
-  description = "List of environment variables to be added to the repository github actions"
+  description = "List of environment variables to be added to the repository github actions environment"
   default     = {}
 }
 

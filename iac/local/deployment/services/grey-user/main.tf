@@ -144,12 +144,12 @@ module "dynamodb_table" {
 
 # Prepare Gitthub
 module "github_action_env" {
-  source                  = "../../../modules/github"
-  repo_name               = var.github_repo
-  owner                   = var.github_owner
-  svc_name                = local.svc_naming_standard
-  github_action_variables = local.github_action_variables
-  github_action_secrets   = local.github_action_secrets
+  source                      = "../../../modules/github"
+  repo_name                   = var.github_repo
+  owner                       = var.github_owner
+  svc_name                    = local.svc_naming_standard
+  github_action_variables_env = local.github_action_variables_env
+  # github_action_secrets_env   = local.github_action_secrets_env
 }
 
 ## Create ArgoCD App

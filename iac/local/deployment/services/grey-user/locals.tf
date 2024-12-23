@@ -15,7 +15,7 @@ locals {
   svc_name            = "${local.svc_standard.Unit}-${local.svc_standard.Feature}"
   svc_secret_standard = "${local.svc_standard.Unit}/${local.svc_standard.Code}/${local.svc_standard.Unit}-${local.svc_standard.Feature}"
   ## Environment variables that will be stored in Github repo environment for Github Actions
-  github_action_variables = {
+  github_action_variables_env = {
     svc_name            = local.svc_name
     svc_naming_standard = local.svc_naming_standard
     svc_naming_full     = local.svc_naming_full
@@ -25,7 +25,7 @@ locals {
     gitops_path_prod    = "charts/stable/app/${local.svc_name}"
   }
   ## Environment secrets that will be stored in Github repo environment for Github Actions
-  github_action_secrets = {
+  github_action_secrets_env = {
     argocd_ssh = base64decode(jsondecode(data.aws_secretsmanager_secret_version.iac.secret_string)["argocd_ssh_base64"])
   }
 }
