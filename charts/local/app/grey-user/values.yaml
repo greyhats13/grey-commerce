@@ -20,11 +20,16 @@ nameOverride: ""
 fullnameOverride: ""
 
 appConfig:
-  app_name: "grey-svc-user" # dummy value
+  AWS_REGION: "ap-southeast-1"
+  DYNAMODB_TABLE: "grey-svc-user"
+  REDIS_ADDR: "redis-master.redis.svc.cluster.local:6379"
+  REDIS_DB: "0"
+  PORT: "8080"
+
 
 appSecret:
   secrets:
-    app_name: "grey-svc-user" #dummy value
+    APP_NAME: "grey-svc-user" #dummy value
 
 externalSecrets:
   enabled: true

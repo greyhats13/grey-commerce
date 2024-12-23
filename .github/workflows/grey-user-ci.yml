@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     # needs: test_and_coverages
     # if: ${{ needs.test_and_coverages.outputs.quality_gate_status != 'FAILED' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') }}
-    if: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/local' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' }}
     outputs:
       image_tag_sha: ${{ steps.set_image_tag.outputs.image_tag_sha }}
       chart_path: ${{ steps.set_image_tag.outputs.chart_path }}
@@ -91,7 +91,7 @@ jobs:
           tags: |
             ${{ vars.GH_OWNER }}/${{ vars.SVC_NAMING_STANDARD }}:${{ env.IMAGE_TAG_SHA }}
             ${{ vars.GH_OWNER }}/${{ vars.SVC_NAMING_STANDARD }}:${{ env.IMAGE_TAG_LATEST }}
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
 
       - name: Build, Tag, and Push
         uses: docker/build-push-action@v6.9.0
@@ -106,9 +106,7 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ vars.SVC_NAMING_STANDARD }}:${{ env.IMAGE_TAG_SHA }}
             ${{ env.REGISTRY }}/${{ vars.SVC_NAMING_STANDARD }}:${{ env.IMAGE_TAG_LATEST }}
-          platforms: linux/amd64
-          # # multi-platform
-          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
 
   deployment:
     environment: grey-user
