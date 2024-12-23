@@ -1,8 +1,12 @@
 # Path: grey-user/Dockerfile
 
-# Build stage
-FROM golang:1.23-alpine AS builder
+# Build stage with multi-platform support
+FROM --platform=$BUILDPLATFORM golang:1.23-alpine AS builder
 WORKDIR /app
+
+# Set necessary environment variables needed for our image
+ARG TARGETOS
+ARG TARGETARCH
 
 # Install necessary packages
 RUN apk update && apk add --no-cache git
@@ -15,8 +19,7 @@ RUN go mod download
 COPY . .
 
 # Build the binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o grey-user ./cmd/main.go
-
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags="-s -w" -o grey-user ./cmd/main.go
 # Final stage
 FROM gcr.io/distroless/base-debian11
 WORKDIR /app
