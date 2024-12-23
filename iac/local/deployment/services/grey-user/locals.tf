@@ -19,6 +19,10 @@ locals {
     svc_name            = local.svc_name
     svc_naming_standard = local.svc_naming_standard
     svc_naming_full     = local.svc_naming_full
+    gitops_path_local   = "charts/local/app/${local.svc_name}"
+    gitops_path_dev     = "charts/incubator/app/${local.svc_name}"
+    gitops_path_stg     = "charts/test/app/${local.svc_name}"
+    gitops_path_prod    = "charts/stable/app/${local.svc_name}"
   }
   ## Environment secrets that will be stored in Github repo environment for Github Actions
   github_action_secrets = {

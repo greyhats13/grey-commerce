@@ -57,24 +57,24 @@ jobs:
           # if the branch is dev, tag the image as incubator
           if [[ $GITHUB_REF == refs/heads/local ]]; then
             echo "image_tag_sha=incubator-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
-            echo "chart_path=gitops/charts/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
+            echo "chart_path=charts/${{ vars.GITOPS_PATH_LOCAL }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
             echo "IMAGE_TAG_SHA=incubator-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
             echo "IMAGE_TAG_LATEST=incubator-latest" >> $GITHUB_ENV
-            echo "CHART_PATH=gitops/charts/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
+            echo "CHART_PATH=charts/${{ vars.GITOPS_PATH_LOCAL }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
           # if the branch is dev, tag the image as alpha
           elif [[ $GITHUB_REF == refs/heads/dev ]]; then
             echo "image_tag_sha=alpha-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
-            echo "chart_path=gitops/charts/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
+            echo "chart_path=charts/${{ vars.GITOPS_PATH_DEV }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
             echo "IMAGE_TAG_SHA=alpha-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
             echo "IMAGE_TAG_LATEST=alpha-latest" >> $GITHUB_ENV
-            echo "CHART_PATH=gitops/charts/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
+            echo "CHART_PATH=charts/${{ vars.GITOPS_PATH_DEV }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
           # if the branch is main, tag the image as beta
           elif [[ $GITHUB_REF == refs/heads/main ]]; then
             echo "image_tag_sha=beta-${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
-            echo "chart_path=gitops/charts/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
+            echo "chart_path=charts/${{ vars.GITOPS_PATH_STG }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_OUTPUT
             echo "IMAGE_TAG_LATEST=beta-latest" >> $GITHUB_ENV
             echo "IMAGE_TAG_SHA=beta-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
-            echo "CHART_PATH=gitops/charts/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
+            echo "CHART_PATH=charts/${{ vars.GITOPS_PATH_STG }}/app/${{ vars.SVC_NAME }}" >> $GITHUB_ENV
           fi
 
       - name: Build, Tag, and Push

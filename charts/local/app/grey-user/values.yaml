@@ -20,11 +20,23 @@ nameOverride: ""
 fullnameOverride: ""
 
 appConfig:
-  app_name: "grey-svc-user"
+  app_name: "grey-svc-user" # dummy value
 
 appSecret:
   secrets:
-    REDIS_PASSWORD: "test" # Ganti dengan external secret
+    app_name: "grey-svc-user" #dummy value
+
+externalSecrets:
+  enabled: true
+  refreshInterval: "1h"
+  secretStoreName: "aws-secretsmanager"
+  secretStoreKind: "ClusterSecretStore"
+  creationPolicy: "Owner"
+  data:
+    REDIS_PASSWORD:
+      key: "grey-svc-user"
+      property: "REDIS_PASSWORD"
+      version: "AWSCURRENT"
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
