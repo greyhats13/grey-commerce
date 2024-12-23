@@ -27,3 +27,4 @@ EXPOSE 8080
 
 # Run the binary
 ENTRYPOINT ["/app/grey-user"]
+
