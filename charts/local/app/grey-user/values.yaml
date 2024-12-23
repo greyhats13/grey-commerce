@@ -23,17 +23,8 @@ appConfig:
   app_name: "grey-svc-user"
 
 appSecret:
-  annotations:
-    avp.kubernetes.io/path: "grey/svc/grey-user"
-    avp.kubernetes.io/secret-version: "AWSCURRENT"
-  # ArgoCD Vault Plugin will replace the placeholders with the actual values from the AWS Secret Manager
-  # Reading from os env not file
   secrets:
-    DB_USER: <db_user>
-    DB_PASSWORD: <db_password>
-    DB_HOST: <db_host>
-    DB_PORT: <db_port>
-    DB_NAME: <db_name>
+    REDIS_PASSWORD: "test" # Ganti dengan external secret
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
