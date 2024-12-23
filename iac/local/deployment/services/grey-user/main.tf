@@ -43,24 +43,24 @@ module "dynamodb_table" {
   billing_mode        = "PROVISIONED"
   read_capacity       = 5
   write_capacity      = 5
-  autoscaling_enabled = true
+  autoscaling_enabled = false
 
-  # Konfigurasi Autoscaling untuk Tabel Utama
-  autoscaling_read = {
-    scale_in_cooldown  = 50
-    scale_out_cooldown = 40
-    target_value       = 75
-    max_capacity       = 20
-    min_capacity       = 5
-  }
+  # # Configure autoscaling for main table
+  # autoscaling_read = {
+  #   scale_in_cooldown  = 50
+  #   scale_out_cooldown = 40
+  #   target_value       = 75
+  #   max_capacity       = 20
+  #   min_capacity       = 5
+  # }
 
-  autoscaling_write = {
-    scale_in_cooldown  = 50
-    scale_out_cooldown = 40
-    target_value       = 75
-    max_capacity       = 20
-    min_capacity       = 5
-  }
+  # autoscaling_write = {
+  #   scale_in_cooldown  = 50
+  #   scale_out_cooldown = 40
+  #   target_value       = 75
+  #   max_capacity       = 20
+  #   min_capacity       = 5
+  # }
 
   # Definisi Atribut Tabel Utama dan GSIs
   attributes = [
@@ -80,10 +80,10 @@ module "dynamodb_table" {
       name = "UpdatedAt"
       type = "S"
     },
-    # Tambahkan atribut lain sesuai kebutuhan
+
   ]
 
-  # Definisi Global Secondary Indexes (GSIs)
+  # Define Global Secondary Indexes (GSIs)
   global_secondary_indexes = [
     {
       name            = "EmailIndex"
@@ -110,35 +110,35 @@ module "dynamodb_table" {
     }
   ]
 
-  # Konfigurasi Autoscaling untuk GSIs
-  autoscaling_indexes = {
-    EmailIndex = {
-      read_min_capacity  = 5
-      read_max_capacity  = 20
-      write_min_capacity = 5
-      write_max_capacity = 20
-      target_value       = 75
-    },
-    CreatedAtIndex = {
-      read_min_capacity  = 5
-      read_max_capacity  = 20
-      write_min_capacity = 5
-      write_max_capacity = 20
-      target_value       = 75
-    },
-    UpdatedAtIndex = {
-      read_min_capacity  = 5
-      read_max_capacity  = 20
-      write_min_capacity = 5
-      write_max_capacity = 20
-      target_value       = 75
-    }
-  }
+  # Configure autoscaling for GSIs
+  # autoscaling_indexes = {
+  #   EmailIndex = {
+  #     read_min_capacity  = 5
+  #     read_max_capacity  = 20
+  #     write_min_capacity = 5
+  #     write_max_capacity = 20
+  #     target_value       = 75
+  #   },
+  #   CreatedAtIndex = {
+  #     read_min_capacity  = 5
+  #     read_max_capacity  = 20
+  #     write_min_capacity = 5
+  #     write_max_capacity = 20
+  #     target_value       = 75
+  #   },
+  #   UpdatedAtIndex = {
+  #     read_min_capacity  = 5
+  #     read_max_capacity  = 20
+  #     write_min_capacity = 5
+  #     write_max_capacity = 20
+  #     target_value       = 75
+  #   }
+  # }
 
   # Tagging untuk pengelolaan
   tags = {
     Environment = "local"
-    Service     = "user-service"
+    Service     = "grey-svc-user"
   }
 }
 
