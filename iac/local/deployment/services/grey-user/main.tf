@@ -163,10 +163,14 @@ module "argocd_app" {
   namespace  = "argocd"
   dns_name   = "${local.svc_standard.Feature}.${var.unit}.blast.co.id"
   extra_vars = {
-    argocd_namespace                       = "argocd"
-    source_repoURL                         = "git@github.com:${var.github_owner}/${var.github_repo}.git"
-    source_targetRevision                  = "HEAD"
-    source_path                            = var.env == "local" ? "charts/${var.env}/app/${local.svc_name}" : var.env == "dev" ? "charts/incubator/app/${local.svc_name}" : "charts/app/${local.svc_name}"
+    argocd_namespace      = "argocd"
+    source_repoURL        = "git@github.com:${var.github_owner}/${var.github_repo}.git"
+    source_targetRevision = "HEAD"
+    source_path = var.env == "dev" ? "charts/app/incubator/${local.svc_name}" : (
+      var.env == "stg" ? "charts/app/test/${local.svc_name}" : (
+        var.env == "prod" ? "charts/app/stable/${local.svc_name}" : "charts/app/local/${local.svc_name}"
+      )
+    )
     project                                = "default"
     destination_server                     = "https://kubernetes.default.svc"
     destination_namespace                  = var.env
