@@ -46,7 +46,7 @@ module "argocd_app" {
     argocd_namespace                       = "argocd"
     source_origin_repoURL                  = "https://charts.external-secrets.io"
     source_origin_chart                    = local.addon_standard.Feature
-    source_origin_targetRevision           = "0.11.0"
+    source_origin_targetRevision           = "0.12.1"
     source_override_repoURL                = "git@github.com:${var.github_owner}/${var.github_repo}.git"
     source_override_targetRevision         = "local"
     source_override_path                   = "charts/local/addons/${local.addon_standard.Feature}/values.yaml"
