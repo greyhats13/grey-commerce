@@ -26,7 +26,7 @@ module "secrets_manager" {
   }
 
   # Version
-  ignore_secret_changes = true
+  ignore_secret_changes = false
   secret_string = jsonencode({
     REDIS_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.iac.secret_string)["REDIS_PASSWORD"]
   })

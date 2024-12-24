@@ -39,7 +39,7 @@ externalSecrets:
   creationPolicy: "Owner"
   data:
     REDIS_PASSWORD:
-      key: "grey-svc-user"
+      key: "grey/svc/user"
       property: "REDIS_PASSWORD"
       version: "AWSCURRENT"
 

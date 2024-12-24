@@ -17,10 +17,6 @@ terraform {
       source  = "hashicorp/helm"
       version = "2.16.1"
     }
-    mysql = {
-      source  = "petoju/mysql"
-      version = "3.0.67"
-    }
     github = {
       source  = "integrations/github"
       version = "~> 6.4.0"
