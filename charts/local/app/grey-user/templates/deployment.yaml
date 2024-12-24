@@ -41,8 +41,6 @@ spec:
             - configMapRef:
                 name: {{ .Release.Name }}
             - secretRef:
-                name: {{ .Release.Name }}
-            - secretRef:
                 name: {{ .Release.Name }}-external-secrets
           ports:
             - name: http
