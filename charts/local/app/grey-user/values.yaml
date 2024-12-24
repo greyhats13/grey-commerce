@@ -103,7 +103,8 @@ ingress:
         - path: /v1/user
           pathType: Prefix
   tls:
-    - hosts:
+    - secretName: grey-svc-user-tls
+      hosts:
         - user.lokal.blast.co.id
 
 resources:
