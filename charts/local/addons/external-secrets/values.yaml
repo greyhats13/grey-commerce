@@ -1,8 +1,8 @@
 replicaCount: 1
 extraEnv:
   - name: AWS_SECRETSMANAGER_ENDPOINT
-    value: "http://localstack.localstack.svc.cluster.local:4566"
+    value: "https://localstack.lokal.blast.co.id"
   - name: AWS_SSM_ENDPOINT
-    value: "http://localstack.localstack.svc.cluster.local:4566"
+    value: "https://localstack.lokal.blast.co.id"
   - name: AWS_STS_ENDPOINT
-    value: "http://localstack.localstack.svc.cluster.local:4566"
+    value: "https://localstack.lokal.blast.co.id"
