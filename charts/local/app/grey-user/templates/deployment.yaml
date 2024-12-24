@@ -15,7 +15,7 @@ spec:
     metadata:
       annotations:
         checksum/config-secret: {{ include "grey-svc-user.configSecretChecksum" . | quote }}
-        checksum/external-config-secret: {{ include "grey-svc-user.configSecretChecksum" . | quote }}
+        checksum/external-config-secret: {{ include "grey-svc-user.externalConfigSecretChecksum" . | quote }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
