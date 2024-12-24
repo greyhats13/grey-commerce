@@ -69,9 +69,9 @@ resource "kubernetes_secret_v1" "secrets" {
   data = {
     access-key                  = "test"
     secret-access-key           = "test"
-    AWS_SECRETSMANAGER_ENDPOINT = "https://localstack.lokal.blast.co.id"
-    AWS_SSM_ENDPOINT            = "https://localstack.lokal.blast.co.id"
-    AWS_STS_ENDPOINT            = "https://localstack.lokal.blast.co.id"
+    # AWS_SECRETSMANAGER_ENDPOINT = "http://localhost:4566"
+    # AWS_SSM_ENDPOINT            = "http://localhost:4566"
+    # AWS_STS_ENDPOINT            = "http://localhost:4566"
   }
   depends_on = [module.argocd_app]
 }
