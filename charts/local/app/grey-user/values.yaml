@@ -27,9 +27,9 @@ appConfig:
   PORT: "8080"
 
 
-appSecret: {}
-  # secrets:
-  #   APP_NAME: "grey-svc-user" #dummy value
+# appSecret: {}
+#   secrets:
+#     APP_NAME: "grey-svc-user" #dummy value
 
 externalSecrets:
   enabled: true
@@ -37,6 +37,7 @@ externalSecrets:
   secretStoreName: "aws-secretsmanager"
   secretStoreKind: "ClusterSecretStore"
   creationPolicy: "Owner"
+  deletionPolicy: "Delete"
   data:
     REDIS_PASSWORD:
       key: "grey/svc/user"
@@ -117,26 +118,26 @@ resources:
     cpu: 100m
     memory: 256Mi
 
-# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-livenessProbe:
-  httpGet:
-    path: /v1/user/healthcheck
-    port: http
-    scheme: HTTP
-  initialDelaySeconds: 30
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
+# # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+# livenessProbe:
+#   httpGet:
+#     path: /v1/user/healthcheck
+#     port: http
+#     scheme: HTTP
+#   initialDelaySeconds: 30
+#   periodSeconds: 10
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
-readinessProbe:
-  httpGet:
-    path: /v1/user/healthcheck
-    port: http
-    scheme: HTTP
-  initialDelaySeconds: 5
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
+# readinessProbe:
+#   httpGet:
+#     path: /v1/user/healthcheck
+#     port: http
+#     scheme: HTTP
+#   initialDelaySeconds: 5
+#   periodSeconds: 10
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
