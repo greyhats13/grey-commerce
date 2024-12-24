@@ -32,7 +32,7 @@ appSecret: {}
   #   APP_NAME: "grey-svc-user" #dummy value
 
 externalSecrets:
-  enabled: false
+  enabled: true
   refreshInterval: "1h"
   secretStoreName: "aws-secretsmanager"
   secretStoreKind: "ClusterSecretStore"
