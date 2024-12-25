@@ -1,4 +1,4 @@
-// File: internal/router/router.go
+// Path: internal/router/router.go
 package router
 
 import (

@@ -28,17 +28,19 @@ func NewUserHandler(s service.UserService) *UserHandler {
 func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	var user model.User
 	if err := c.BodyParser(&user); err != nil {
-		return fiber.NewError(http.StatusBadRequest, app.ErrInvalidRequest.Error())
+		return fiber.NewError(http.StatusBadRequest, app.ErrFailedToParse.Error())
 	}
 
 	// Validate struct fields
 	if err := validate.Struct(user); err != nil {
-		return fiber.NewError(http.StatusBadRequest, err.Error())
+		return fiber.NewError(http.StatusBadRequest, app.ErrFailedToValidate.Error())
 	}
 
 	if err := h.service.CreateUser(c.Context(), &user); err != nil {
 		if err == app.ErrInvalidRequest {
-			return fiber.NewError(http.StatusBadRequest, err.Error())
+			return fiber.NewError(http.StatusBadRequest, app.ErrFailedToParse.Error())
+		} else if err == app.ErrFailedToValidate {
+			return fiber.NewError(http.StatusBadRequest, app.ErrFailedToValidate.Error())
 		}
 		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
