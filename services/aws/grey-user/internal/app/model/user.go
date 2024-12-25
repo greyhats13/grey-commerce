@@ -40,7 +40,7 @@ type Address struct {
 // Phone represents a user's phone. Remove "required" if you want them optional
 type Phone struct {
 	Type   string `json:"type" dynamodbav:"type" validate:"required"`
-	Code   string `json:"code" dynamodbav:"countryCode" validate:"required"`
+	Code   string `json:"code" dynamodbav:"code" validate:"required"`
 	Number string `json:"number" dynamodbav:"number" validate:"required"`
 }
 
