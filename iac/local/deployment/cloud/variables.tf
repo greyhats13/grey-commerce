@@ -84,3 +84,15 @@ variable "argocd_vault_plugin_version" {
   type        = string
   description = "ArgoCD Vault plugin version"
 }
+
+### Docker
+variable "docker_username" {
+  type        = string
+  description = "Docker username"
+}
+
+variable "docker_password" {
+  type        = string
+  description = "Docker password"
+  sensitive   = true
+}

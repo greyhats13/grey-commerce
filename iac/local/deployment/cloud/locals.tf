@@ -22,4 +22,14 @@ locals {
     Feature = "argocd"
   }
   argocd_naming_standard = "${local.argocd_standard.Unit}-${local.argocd_standard.Env}-${local.argocd_standard.Code}-${local.argocd_standard.Feature}"
+  # Github Locals
+  github_action_variables = {
+    DOCKER_USERNAME = var.docker_username
+    GH_OWNER        = var.github_owner
+    GH_REPO_NAME    = var.github_repo
+  }
+  github_action_secrets = {
+    ARGOCD_SSH      = tls_private_key.argocd_ssh.private_key_pem
+    DOCKER_PASSWORD = var.docker_password
+  }
 }

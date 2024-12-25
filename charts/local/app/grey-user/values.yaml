@@ -20,11 +20,40 @@ nameOverride: ""
 fullnameOverride: ""
 
 appConfig:
-  app_name: "grey-svc-user"
+  APP_NAME: "grey-svc-user"
+  APP_ENV: "local"
+  AWS_REGION: "ap-southeast-1"
+  DYNAMODB_TABLE: "grey-svc-user"
+  REDIS_ADDR: "redis-master.redis.svc.cluster.local:6379"
+  REDIS_DB: "0"
+  REDIS_TTL: "3600"
+  PORT: "8080"
+  LOCAL_STACK_ENDPOINT: "http://localstack.localstack.svc.cluster.local:4566"
 
-appSecret:
-  secrets:
-    REDIS_PASSWORD: "test" # Ganti dengan external secret
+# appSecret: {}
+#   secrets:
+#     APP_NAME: "grey-svc-user" #dummy value
+
+externalSecrets:
+  enabled: true
+  refreshInterval: "1h"
+  secretStoreName: "aws-secretsmanager"
+  secretStoreKind: "ClusterSecretStore"
+  creationPolicy: "Owner"
+  deletionPolicy: "Delete"
+  data:
+    REDIS_PASSWORD:
+      key: "grey/svc/user"
+      property: "REDIS_PASSWORD"
+      version: "AWSCURRENT"
+    AWS_ACCESS_KEY_ID:
+      key: "grey/svc/user"
+      property: "AWS_ACCESS_KEY_ID"
+      version: "AWSCURRENT"
+    AWS_SECRET_ACCESS_KEY:
+      key: "grey/svc/user"
+      property: "AWS_SECRET_ACCESS_KEY"
+      version: "AWSCURRENT"
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
@@ -67,7 +96,7 @@ service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 8000
+  port: 8080
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -85,7 +114,8 @@ ingress:
         - path: /v1/user
           pathType: Prefix
   tls:
-    - hosts:
+    - secretName: grey-svc-user-tls
+      hosts:
         - user.lokal.blast.co.id
 
 resources:
@@ -100,26 +130,26 @@ resources:
     cpu: 100m
     memory: 256Mi
 
-# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-livenessProbe:
-  httpGet:
-    path: /v1/user/healthcheck
-    port: http
-    scheme: HTTP
-  initialDelaySeconds: 30
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
+# # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+# livenessProbe:
+#   httpGet:
+#     path: /v1/user/healthcheck
+#     port: http
+#     scheme: HTTP
+#   initialDelaySeconds: 30
+#   periodSeconds: 10
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
-readinessProbe:
-  httpGet:
-    path: /v1/user/healthcheck
-    port: http
-    scheme: HTTP
-  initialDelaySeconds: 5
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
+# readinessProbe:
+#   httpGet:
+#     path: /v1/user/healthcheck
+#     port: http
+#     scheme: HTTP
+#   initialDelaySeconds: 5
+#   periodSeconds: 10
+#   timeoutSeconds: 5
+#   failureThreshold: 3
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:

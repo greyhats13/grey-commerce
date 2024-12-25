@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config-secret: {{ include "grey-svc-user.configSecretChecksum" . | quote }}
+        checksum/external-config-secret: {{ include "grey-svc-user.externalConfigSecretChecksum" . | quote }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -41,7 +41,7 @@ spec:
             - configMapRef:
                 name: {{ .Release.Name }}
             - secretRef:
-                name: {{ .Release.Name }}
+                name: {{ .Release.Name }}-external-secrets
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}

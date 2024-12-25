@@ -7,10 +7,12 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// zapLogger implements the Logger interface using Zap.
 type zapLogger struct {
 	logger *zap.Logger
 }
 
+// NewZapLogger initializes and returns a new Zap logger.
 func NewZapLogger() (Logger, error) {
 	cfg := zap.NewProductionConfig()
 	cfg.Encoding = "json"
@@ -29,23 +31,32 @@ func NewZapLogger() (Logger, error) {
 	return &zapLogger{logger: l}, nil
 }
 
+// Info logs an info-level message.
 func (z *zapLogger) Info(msg string, fields ...Field) {
 	z.logger.Info(msg, convertFields(fields)...)
 }
 
+// Warn logs a warning-level message.
+func (z *zapLogger) Warn(msg string, fields ...Field) {
+	z.logger.Warn(msg, convertFields(fields)...)
+}
+
+// Error logs an error-level message.
 func (z *zapLogger) Error(msg string, fields ...Field) {
 	z.logger.Error(msg, convertFields(fields)...)
 }
 
+// Fatal logs a fatal-level message and exits the application.
 func (z *zapLogger) Fatal(msg string, err error, fields ...Field) {
 	allFields := append(fields, Field{Key: "error", Value: err.Error()})
 	z.logger.Fatal(msg, convertFields(allFields)...)
 }
 
+// convertFields converts custom Fields to Zap's Fields.
 func convertFields(fields []Field) []zap.Field {
-	zf := make([]zap.Field, len(fields))
+	zapFields := make([]zap.Field, len(fields))
 	for i, f := range fields {
-		zf[i] = zap.Any(f.Key, f.Value)
+		zapFields[i] = zap.Any(f.Key, f.Value)
 	}
-	return zf
+	return zapFields
 }

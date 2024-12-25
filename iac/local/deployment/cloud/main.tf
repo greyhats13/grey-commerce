@@ -25,7 +25,7 @@ module "secrets_iac" {
   }
 
   # Version
-  ignore_secret_changes = true
+  ignore_secret_changes = false
   secret_string = jsonencode({
     argocd_ssh_base64 = base64encode(tls_private_key.argocd_ssh.private_key_pem)
     REDIS_PASSWORD    = random_password.redis.result
@@ -73,6 +73,8 @@ module "github" {
   ssh_key                    = tls_private_key.argocd_ssh.private_key_pem
   is_deploy_key_read_only    = false
   argocd_namespace           = "argocd"
+  github_action_variables    = local.github_action_variables
+  github_action_secrets      = local.github_action_secrets
   depends_on = [
     module.argocd,
   ]

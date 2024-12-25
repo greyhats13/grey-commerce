@@ -10,13 +10,13 @@ applications:
       repoURL: ${extra_vars.source_repoURL}
       targetRevision: ${extra_vars.source_targetRevision}
       path: ${extra_vars.source_path}
-      plugin:
-        name: argocd-vault-plugin-helm
-        env:
-          - name: AVP_TYPE
-            value: ${extra_vars.avp_type}
-          - name: AWS_REGION
-            value: ${extra_vars.region}
+      # plugin:
+      #   name: argocd-vault-plugin-helm
+      #   env:
+      #     - name: AVP_TYPE
+      #       value: ${extra_vars.avp_type}
+      #     - name: AWS_REGION
+      #       value: ${extra_vars.region}
       directory:
         recurse: false
     destination:

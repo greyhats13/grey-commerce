@@ -46,9 +46,9 @@ module "argocd_app" {
     argocd_namespace                       = "argocd"
     source_origin_repoURL                  = "https://charts.external-secrets.io"
     source_origin_chart                    = local.addon_standard.Feature
-    source_origin_targetRevision           = "0.11.0"
+    source_origin_targetRevision           = "0.12.1"
     source_override_repoURL                = "git@github.com:${var.github_owner}/${var.github_repo}.git"
-    source_override_targetRevision         = "main"
+    source_override_targetRevision         = "local"
     source_override_path                   = "charts/local/addons/${local.addon_standard.Feature}/values.yaml"
     project                                = "default"
     destination_server                     = "https://kubernetes.default.svc"
@@ -69,9 +69,9 @@ resource "kubernetes_secret_v1" "secrets" {
   data = {
     access-key                  = "test"
     secret-access-key           = "test"
-    AWS_SECRETSMANAGER_ENDPOINT = "https://localstack.lokal.blast.co.id"
-    AWS_SSM_ENDPOINT            = "https://localstack.lokal.blast.co.id"
-    AWS_STS_ENDPOINT            = "https://localstack.lokal.blast.co.id"
+    AWS_SECRETSMANAGER_ENDPOINT = "http://localstack.localstack.svc.cluster.local:4566"
+    AWS_SSM_ENDPOINT            = "http://localstack.localstack.svc.cluster.local:4566"
+    AWS_STS_ENDPOINT            = "http://localstack.localstack.svc.cluster.local:4566"
   }
   depends_on = [module.argocd_app]
 }

@@ -43,13 +43,13 @@ resource "kubernetes_secret_v1" "argocd" {
 }
 
 resource "github_repository_environment" "environment" {
-  count       = (length(var.github_action_secrets) > 0 || length(var.github_action_variables) > 0) ? 1 : 0
+  count       = (length(var.github_action_secrets_env) > 0 || length(var.github_action_variables_env) > 0) ? 1 : 0
   environment = var.svc_name
   repository  = var.repo_name
 }
 
 resource "github_actions_environment_variable" "variable" {
-  for_each      = var.github_action_variables
+  for_each      = var.github_action_variables_env
   repository    = var.repo_name
   environment   = github_repository_environment.environment[0].environment
   variable_name = each.key
@@ -57,9 +57,26 @@ resource "github_actions_environment_variable" "variable" {
 }
 
 resource "github_actions_environment_secret" "secret" {
-  for_each        = tomap(var.github_action_secrets)
+  for_each        = tomap(var.github_action_secrets_env)
   repository      = var.repo_name
   environment     = github_repository_environment.environment[0].environment
   secret_name     = each.key
   plaintext_value = try(each.value.plaintext, each.value)
+}
+
+resource "github_actions_variable" "variable" {
+  for_each      = var.github_action_variables
+  repository    = var.repo_name
+  variable_name = each.key
+  value         = each.value
+}
+
+resource "github_actions_secret" "secret" {
+  for_each        = tomap(var.github_action_secrets)
+  repository      = var.repo_name
+  secret_name     = each.key
+  plaintext_value = try(each.value.plaintext, each.value)
+  lifecycle {
+    ignore_changes = [plaintext_value]
+  }
 }

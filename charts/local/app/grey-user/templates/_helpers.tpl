@@ -69,15 +69,15 @@ Generate a checksum for ConfigMap
 {{- end }}
 
 {{/*
-Generate a checksum for Secret
+Generate a checksum for External Secret
 */}}
-{{- define "grey-svc-user.secretHash" -}}
-{{- toYaml .Values.appSecret.secrets | sha256sum }}
+{{- define "grey-svc-user.externalSecretHash" -}}
+{{- toYaml .Values.externalSecrets.data | sha256sum }}
 {{- end }}
 
 {{/*
-Combine both checksums
+Combine both checksums for external config secret
 */}}
-{{- define "grey-svc-user.configSecretChecksum" -}}
-{{ include "grey-svc-user.configmapHash" . }}-{{ include "grey-svc-user.secretHash" . }}
+{{- define "grey-svc-user.externalConfigSecretChecksum" -}}
+{{ include "grey-svc-user.configmapHash" . }}-{{ include "grey-svc-user.externalSecretHash" . }}
 {{- end }}
