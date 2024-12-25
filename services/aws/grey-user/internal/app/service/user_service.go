@@ -15,7 +15,7 @@ type UserService interface {
 	UpdateUser(ctx context.Context, uuid string, updateReq map[string]interface{}) (*model.User, error)
 	GetUser(ctx context.Context, uuid string) (*model.User, error)
 	DeleteUser(ctx context.Context, uuid string) error
-	ListUsers(ctx context.Context, limit int64, lastKey string) ([]model.User, string, error)
+	ListUsers(ctx context.Context, limit int32, lastKey string) ([]model.User, string, error)
 }
 
 type userService struct {
@@ -80,7 +80,7 @@ func (s *userService) DeleteUser(ctx context.Context, uuidStr string) error {
 	return nil
 }
 
-func (s *userService) ListUsers(ctx context.Context, limit int64, lastKey string) ([]model.User, string, error) {
+func (s *userService) ListUsers(ctx context.Context, limit int32, lastKey string) ([]model.User, string, error) {
 	if limit <= 0 {
 		limit = 10
 	}

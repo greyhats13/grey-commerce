@@ -1,103 +1,134 @@
-// Path: pkg/databases/dynamodb_database.go
+// Path: grey-user/pkg/databases/dynamodb_database.go
+
 package databases
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-// dynamoDBDatabase is an implementation of the Database interface for DynamoDB
+// dynamoDBDatabase is an implementation of the Database interface for AWS SDK v2
 type dynamoDBDatabase struct {
 	client *DynamoDBClient
 }
 
-// NewDynamoDBDatabase returns a struct implementing Database interface
+// NewDynamoDBDatabase returns a struct implementing the Database interface
 func NewDynamoDBDatabase(client *DynamoDBClient) Database {
 	return &dynamoDBDatabase{client: client}
 }
 
 // PutItem puts or updates an item in a DynamoDB table
 func (d *dynamoDBDatabase) PutItem(ctx context.Context, item interface{}, conditionExpression *string, tableName string) error {
-	av, err := dynamodbattribute.MarshalMap(item)
+	// Marshal the Go struct (or map) into a dynamodb attribute value map
+	av, err := attributevalue.MarshalMap(item)
 	if err != nil {
 		return err
 	}
+
 	input := &dynamodb.PutItemInput{
-		TableName: aws.String(tableName),
+		TableName: awsString(tableName),
 		Item:      av,
 	}
+
 	if conditionExpression != nil {
 		input.ConditionExpression = conditionExpression
 	}
-	_, err = d.client.Client.PutItemWithContext(ctx, input)
+
+	// AWS SDK v2 uses PutItem(ctx, input) instead of PutItemWithContext
+	_, err = d.client.Client.PutItem(ctx, input)
 	return err
 }
 
 // GetItem retrieves an item from a DynamoDB table
 func (d *dynamoDBDatabase) GetItem(ctx context.Context, key map[string]interface{}, tableName string) (map[string]interface{}, error) {
-	keyAV, err := dynamodbattribute.MarshalMap(key)
+	// Marshal the 'key' map into a dynamodb attribute value map
+	keyAV, err := attributevalue.MarshalMap(key)
 	if err != nil {
 		return nil, err
 	}
-	res, err := d.client.Client.GetItemWithContext(ctx, &dynamodb.GetItemInput{
-		TableName: aws.String(tableName),
+
+	// Perform the GetItem request
+	res, err := d.client.Client.GetItem(ctx, &dynamodb.GetItemInput{
+		TableName: awsString(tableName),
 		Key:       keyAV,
 	})
 	if err != nil {
 		return nil, err
 	}
+
 	if res.Item == nil {
 		return nil, fmt.Errorf("not found")
 	}
+
+	// Unmarshal it into a generic map
 	out := map[string]interface{}{}
-	if err := dynamodbattribute.UnmarshalMap(res.Item, &out); err != nil {
+	if err := attributevalue.UnmarshalMap(res.Item, &out); err != nil {
 		return nil, err
 	}
+
 	return out, nil
 }
 
 // DeleteItem deletes an item from a DynamoDB table
 func (d *dynamoDBDatabase) DeleteItem(ctx context.Context, key map[string]interface{}, tableName string) error {
-	keyAV, err := dynamodbattribute.MarshalMap(key)
+	keyAV, err := attributevalue.MarshalMap(key)
 	if err != nil {
 		return err
 	}
-	_, err = d.client.Client.DeleteItemWithContext(ctx, &dynamodb.DeleteItemInput{
-		TableName: aws.String(tableName),
+
+	_, err = d.client.Client.DeleteItem(ctx, &dynamodb.DeleteItemInput{
+		TableName: awsString(tableName),
 		Key:       keyAV,
 	})
+
 	return err
 }
 
-// QueryItems scans or queries items from a DynamoDB table
-func (d *dynamoDBDatabase) QueryItems(ctx context.Context, tableName string, limit int64, lastKey string) ([]map[string]interface{}, string, error) {
+// QueryItems scans items from a DynamoDB table (renamed from Query to Scan for brevity)
+func (d *dynamoDBDatabase) QueryItems(ctx context.Context, tableName string, limit int32, lastKey string) ([]map[string]interface{}, string, error) {
+	// We're using Scan here; if you need a more refined Query, you'll adapt accordingly
 	input := &dynamodb.ScanInput{
-		TableName: aws.String(tableName),
-		Limit:     aws.Int64(limit),
+		TableName: awsString(tableName),
+		Limit:     &limit,
 	}
+
+	// If lastKey is provided, set the ExclusiveStartKey
 	if lastKey != "" {
-		input.ExclusiveStartKey = map[string]*dynamodb.AttributeValue{
-			"uuid": {S: aws.String(lastKey)},
+		input.ExclusiveStartKey = map[string]types.AttributeValue{
+			"uuid": &types.AttributeValueMemberS{Value: lastKey},
 		}
 	}
-	res, err := d.client.Client.ScanWithContext(ctx, input)
+
+	// Perform the Scan
+	res, err := d.client.Client.Scan(ctx, input)
 	if err != nil {
 		return nil, "", err
 	}
+
+	// Convert each item from AttributeValue map to Go map
 	items := make([]map[string]interface{}, 0, len(res.Items))
 	for _, i := range res.Items {
 		tmp := map[string]interface{}{}
-		if err := dynamodbattribute.UnmarshalMap(i, &tmp); err == nil {
+		if err := attributevalue.UnmarshalMap(i, &tmp); err == nil {
 			items = append(items, tmp)
 		}
 	}
+
+	// Get the next key if present
 	next := ""
-	if res.LastEvaluatedKey != nil && res.LastEvaluatedKey["uuid"] != nil {
-		next = *res.LastEvaluatedKey["uuid"].S
+	if len(res.LastEvaluatedKey) > 0 {
+		if val, ok := res.LastEvaluatedKey["uuid"].(*types.AttributeValueMemberS); ok {
+			next = val.Value
+		}
 	}
+
 	return items, next, nil
+}
+
+func awsString(val string) *string {
+	return &val
 }

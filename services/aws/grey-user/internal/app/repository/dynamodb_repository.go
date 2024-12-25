@@ -9,7 +9,7 @@ import (
 	"grey-user/pkg/databases"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/google/uuid"
 )
 
@@ -19,7 +19,7 @@ type DynamoDBUserRepository struct {
 	table string
 }
 
-// NewDynamoDBUserRepository returns a new DynamoDBUserRepository to handle user data
+// NewDynamoDBUserRepository returns a new DynamoDBUserRepository
 func NewDynamoDBUserRepository(db databases.Database, table string) UserRepository {
 	return &DynamoDBUserRepository{
 		db:    db,
@@ -34,7 +34,7 @@ func (r *DynamoDBUserRepository) CreateUser(ctx context.Context, user *model.Use
 	user.CreatedAt = now
 	user.UpdatedAt = now
 
-	cond := "attribute_not_exists(uuid)"
+	cond := "attribute_not_exists(uuid)" // ensures we don't overwrite existing user
 	return r.db.PutItem(ctx, user, &cond, r.table)
 }
 
@@ -55,21 +55,28 @@ func (r *DynamoDBUserRepository) GetUser(ctx context.Context, uuidStr string) (*
 	key := map[string]interface{}{
 		"uuid": uuidStr,
 	}
+	// db.GetItem returns a map[string]interface{} if the item is found
 	res, err := r.db.GetItem(ctx, key, r.table)
 	if err != nil {
+		// Check if the error is "not found"
 		if err.Error() == "not found" {
 			return nil, errors.ErrNotFound
 		}
 		return nil, err
 	}
-	var user model.User
-	av, err := dynamodbattribute.MarshalMap(res)
+
+	// Marshal the res map back to an attribute value
+	av, err := attributevalue.MarshalMap(res)
 	if err != nil {
 		return nil, err
 	}
-	if err := dynamodbattribute.UnmarshalMap(av, &user); err != nil {
+
+	// Then unmarshal into the user struct
+	var user model.User
+	if err := attributevalue.UnmarshalMap(av, &user); err != nil {
 		return nil, err
 	}
+
 	return &user, nil
 }
 
@@ -85,21 +92,24 @@ func (r *DynamoDBUserRepository) DeleteUser(ctx context.Context, uuidStr string)
 }
 
 // ListUsers returns a list of users from DynamoDB with pagination
-func (r *DynamoDBUserRepository) ListUsers(ctx context.Context, limit int64, lastKey string) ([]model.User, string, error) {
-	out, next, err := r.db.QueryItems(ctx, r.table, limit, lastKey)
+func (r *DynamoDBUserRepository) ListUsers(ctx context.Context, limit int32, lastKey string) ([]model.User, string, error) {
+	out, nextKey, err := r.db.QueryItems(ctx, r.table, limit, lastKey)
 	if err != nil {
 		return nil, "", err
 	}
+
 	users := make([]model.User, 0, len(out))
 	for _, data := range out {
-		av, err := dynamodbattribute.MarshalMap(data)
+		av, err := attributevalue.MarshalMap(data)
 		if err != nil {
+			// skip this record if there's an error
 			continue
 		}
 		var u model.User
-		if err := dynamodbattribute.UnmarshalMap(av, &u); err == nil {
+		if err := attributevalue.UnmarshalMap(av, &u); err == nil {
 			users = append(users, u)
 		}
 	}
-	return users, next, nil
+
+	return users, nextKey, nil
 }
