@@ -15,7 +15,7 @@ type User struct {
 	Firstname     string          `json:"firstname" dynamodbav:"firstname" validate:"required"`
 	Lastname      string          `json:"lastname" dynamodbav:"lastname" validate:"required"`
 	Gender        string          `json:"gender" dynamodbav:"gender" validate:"required"`
-	Birthdate     time.Time       `json:"birthdate" dynamodbav:"birthdate" validate:"datetime=2006-01-02"`
+	Birthdate     time.Time       `json:"birthdate" dynamodbav:"birthdate"`
 	Addresses     []Address       `json:"addresses" dynamodbav:"addresses"`
 	Phones        []Phone         `json:"phones" dynamodbav:"phones"`
 	PaymentMethod []PaymentMethod `json:"paymentMethod" dynamodbav:"paymentMethod"`

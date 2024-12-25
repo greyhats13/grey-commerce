@@ -27,5 +27,5 @@ go.work.sum
 secrets/*
 sample-error.txt
 singe-file/*
-README.md
+*.md
 .DS_Store

@@ -18,7 +18,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// This example uses only DynamoDB for the database and Redis for the cache
 func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -48,9 +47,13 @@ func main() {
 	// Dependency injection for service
 	userService := service.NewUserService(userRepo, redisCache)
 
+	// Create Fiber with our custom error handler
 	app := fiber.New(fiber.Config{
 		JSONEncoder: utils.JSONMarshal,
 		JSONDecoder: utils.JSONUnmarshal,
+
+		// Use our custom error handler
+		ErrorHandler: middleware.CustomErrorHandler,
 	})
 
 	// Middlewares

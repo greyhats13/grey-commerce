@@ -1,4 +1,4 @@
-// File: internal/app/service/user_service.go
+// Path: internal/app/service/user_service.go
 package service
 
 import (

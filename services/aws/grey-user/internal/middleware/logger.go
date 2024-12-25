@@ -3,6 +3,7 @@
 package middleware
 
 import (
+	"errors"
 	"grey-user/pkg/logger"
 	"strconv"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// RequestIDMiddleware assigns a request ID to each request
 func RequestIDMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id := uuid.New().String()
@@ -19,6 +21,7 @@ func RequestIDMiddleware() fiber.Handler {
 	}
 }
 
+// ZapLoggerMiddleware logs each request using the provided zap-compatible logger
 func ZapLoggerMiddleware(log logger.Logger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Record start time and read the request body size
@@ -28,18 +31,30 @@ func ZapLoggerMiddleware(log logger.Logger) fiber.Handler {
 		// Continue to next middleware or actual route
 		err := c.Next()
 
+		// Retrieve final status code: if err != nil, we check if it's a fiber.Error
+		status := c.Response().StatusCode() // Default if no fiber.Error is found
+
+		if err != nil {
+			// Attempt to parse the fiber.Error for an accurate status code
+			var fe *fiber.Error
+			if errors.As(err, &fe) {
+				status = fe.Code
+			} else {
+				// Otherwise, assume it's a server error
+				status = fiber.StatusInternalServerError
+			}
+		}
+
 		// End time for latency
 		stop := time.Now()
 
-		// Retrieve the final status code set by handlers
-		status := c.Response().StatusCode()
-
-		// Figure out severity
+		// Determine severity
 		severity := "INFO"
-		if status >= 400 && status < 500 {
-			severity = "WARNING"
-		} else if status >= 500 {
+		switch {
+		case status >= 500:
 			severity = "ERROR"
+		case status >= 400:
+			severity = "WARNING"
 		}
 
 		// requestId from locals
@@ -72,21 +87,20 @@ func ZapLoggerMiddleware(log logger.Logger) fiber.Handler {
 			{Key: "httpRequest", Value: httpRequest},
 		}
 
+		// If there was an error, override the message with error details
 		if err != nil {
-			// Add error details to log fields
-			fields = append(fields,
-				logger.Field{Key: "message", Value: err.Error()},
-			)
+			fields = append(fields, logger.Field{Key: "message", Value: err.Error()})
+
+			// Log according to severity
 			if severity == "ERROR" {
 				log.Error("", fields...)
-			} else if severity == "WARNING" {
-				log.Warn("", fields...)
 			} else {
-				log.Info("", fields...)
+				log.Warn("", fields...)
 			}
 			return err
 		}
 
+		// No error, log as INFO
 		log.Info("", fields...)
 		return nil
 	}
