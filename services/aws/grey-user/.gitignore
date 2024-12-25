@@ -24,5 +24,8 @@ go.work.sum
 # env file
 .env
 *.log
-secrets/ 
-
+secrets/*
+sample-error.txt
+singe-file/*
+README.md
+.DS_Store

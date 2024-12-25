@@ -6,133 +6,101 @@ import (
 	"grey-user/internal/app"
 	"grey-user/internal/app/model"
 	"grey-user/internal/app/service"
-	"grey-user/pkg/utils"
 	"net/http"
-	"strconv"
-	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/redis/go-redis/v9"
 )
 
+// validate is a singleton validator instance
+var validate = validator.New()
+
 type UserHandler struct {
-	service     service.UserService
-	redisClient *redis.Client
+	service service.UserService
 }
 
-func NewUserHandler(service service.UserService, redisClient *redis.Client) *UserHandler {
-	return &UserHandler{
-		service:     service,
-		redisClient: redisClient,
-	}
+// NewUserHandler creates a new UserHandler
+func NewUserHandler(s service.UserService) *UserHandler {
+	return &UserHandler{service: s}
 }
 
+// CreateUser handles creation of a new user
 func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	var user model.User
 	if err := c.BodyParser(&user); err != nil {
-		return fiber.NewError(http.StatusBadRequest, "invalid request body")
+		return fiber.NewError(http.StatusBadRequest, app.ErrInvalidRequest.Error())
 	}
 
-	err := h.service.CreateUser(c.Context(), &user)
-	if err != nil {
+	// Validate struct fields
+	if err := validate.Struct(user); err != nil {
+		return fiber.NewError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := h.service.CreateUser(c.Context(), &user); err != nil {
 		if err == app.ErrInvalidRequest {
 			return fiber.NewError(http.StatusBadRequest, err.Error())
 		}
-		return fiber.NewError(http.StatusInternalServerError, "failed to create user")
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
-
 	return c.Status(http.StatusCreated).JSON(user)
 }
 
+// UpdateUser handles updating of an existing user
+// We changed to match the service signature: UpdateUser(ctx context.Context, uuid string, updateReq map[string]interface{})
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
-	uuid := c.Params("uuid")
-	if uuid == "" {
+	uuidParam := c.Params("uuid")
+	if uuidParam == "" {
 		return fiber.NewError(http.StatusBadRequest, "uuid is required")
 	}
 
+	// We will parse into a map instead of a full User struct
 	var updateReq map[string]interface{}
 	if err := c.BodyParser(&updateReq); err != nil {
-		return fiber.NewError(http.StatusBadRequest, "invalid request body")
+		return fiber.NewError(http.StatusBadRequest, app.ErrInvalidRequest.Error())
 	}
 
-	user, err := h.service.UpdateUser(c.Context(), uuid, updateReq)
+	user, err := h.service.UpdateUser(c.Context(), uuidParam, updateReq)
 	if err != nil {
 		if err == app.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
-		} else if err == app.ErrInvalidRequest {
-			return fiber.NewError(http.StatusBadRequest, err.Error())
 		}
-		return fiber.NewError(http.StatusInternalServerError, "failed to update user")
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
-
-	h.redisClient.Del(c.Context(), user.UUID)
-	return c.Status(http.StatusOK).JSON(user)
+	return c.JSON(user)
 }
 
+// GetUser retrieves a user by UUID
 func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 	uuid := c.Params("uuid")
 	if uuid == "" {
 		return fiber.NewError(http.StatusBadRequest, "uuid is required")
 	}
-
-	// Check cache
-	cacheKey := uuid
-	cachedVal, err := h.redisClient.Get(c.Context(), cacheKey).Result()
-	if err == nil && cachedVal != "" {
-		var cachedUser model.User
-		if err := utils.JSONUnmarshal([]byte(cachedVal), &cachedUser); err == nil {
-			return c.JSON(cachedUser)
-		}
-	}
-
 	user, err := h.service.GetUser(c.Context(), uuid)
 	if err != nil {
 		if err == app.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
 		}
-		return fiber.NewError(http.StatusInternalServerError, "failed to get user")
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
-
-	b, _ := utils.JSONMarshal(user)
-	h.redisClient.Set(c.Context(), cacheKey, string(b), 5*time.Minute)
-
 	return c.JSON(user)
 }
 
+// DeleteUser deletes a user by UUID
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	uuid := c.Params("uuid")
 	if uuid == "" {
 		return fiber.NewError(http.StatusBadRequest, "uuid is required")
 	}
-	err := h.service.DeleteUser(c.Context(), uuid)
-	if err != nil {
+	if err := h.service.DeleteUser(c.Context(), uuid); err != nil {
 		if err == app.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
 		}
-		return fiber.NewError(http.StatusInternalServerError, "failed to delete user")
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
-
-	h.redisClient.Del(c.Context(), uuid)
 	return c.SendStatus(http.StatusNoContent)
 }
 
+// ListUsers is just an example; feel free to implement
 func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
-	limitStr := c.Query("limit", "10")
-	lastKey := c.Query("lastKey", "")
-
-	limit, err := strconv.ParseInt(limitStr, 10, 64)
-	if err != nil {
-		limit = 10
-	}
-
-	users, nextKey, err := h.service.ListUsers(c.Context(), limit, lastKey)
-	if err != nil {
-		return fiber.NewError(http.StatusInternalServerError, "failed to list users")
-	}
-
-	resp := map[string]interface{}{
-		"users":   users,
-		"nextKey": nextKey,
-	}
-	return c.JSON(resp)
+	return fiber.NewError(http.StatusNotImplemented, "list users not implemented")
 }

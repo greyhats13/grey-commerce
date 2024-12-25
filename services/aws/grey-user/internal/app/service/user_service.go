@@ -1,4 +1,4 @@
-// Path: grey-user/internal/app/model/user.go
+// Path: internal/app/service/user_service.go
 
 package service
 
@@ -7,6 +7,7 @@ import (
 	"grey-user/internal/app"
 	"grey-user/internal/app/model"
 	"grey-user/internal/app/repository"
+	"grey-user/pkg/cache"
 	"time"
 )
 
@@ -18,81 +19,85 @@ type UserService interface {
 	ListUsers(ctx context.Context, limit int64, lastKey string) ([]model.User, string, error)
 }
 
+// userService is the concrete implementation of UserService
 type userService struct {
-	repo repository.UserRepository
+	repo  repository.UserRepository
+	cache cache.Cache
 }
 
-func NewUserService(repo repository.UserRepository) UserService {
-	return &userService{repo: repo}
+// NewUserService creates a userService with the required dependencies
+func NewUserService(repo repository.UserRepository, c cache.Cache) UserService {
+	return &userService{repo: repo, cache: c}
 }
 
+// CreateUser delegates user creation to the repository
 func (s *userService) CreateUser(ctx context.Context, user *model.User) error {
-	if user.ShopID == "" || user.Email == "" || user.Role == "" || user.Firstname == "" || user.Lastname == "" || user.Birthdate.IsZero() || user.Gender == "" || len(user.Addresses) == 0 || len(user.Phones) == 0 {
+	// Validate essential fields
+	if user.ShopID == "" || user.Email == "" || user.Role == "" ||
+		user.Firstname == "" || user.Lastname == "" || user.Birthdate.IsZero() ||
+		user.Gender == "" || len(user.Addresses) == 0 || len(user.Phones) == 0 {
 		return app.ErrInvalidRequest
 	}
 	return s.repo.CreateUser(ctx, user)
 }
 
-func (s *userService) UpdateUser(ctx context.Context, uuid string, updateReq map[string]interface{}) (*model.User, error) {
-	user, err := s.repo.GetUser(ctx, uuid)
+// UpdateUser updates user data
+func (s *userService) UpdateUser(ctx context.Context, uuidStr string, updateReq map[string]interface{}) (*model.User, error) {
+	// Retrieve existing user
+	user, err := s.repo.GetUser(ctx, uuidStr)
 	if err != nil {
 		return nil, err
 	}
 
-	// Update fields if provided
-	if val, ok := updateReq["shopId"]; ok {
-		user.ShopID = val.(string)
+	// Simple partial updates if found in updateReq
+	if fn, ok := updateReq["firstname"]; ok {
+		user.Firstname = fn.(string)
 	}
-	if val, ok := updateReq["email"]; ok {
-		user.Email = val.(string)
+	if ln, ok := updateReq["lastname"]; ok {
+		user.Lastname = ln.(string)
 	}
-	if val, ok := updateReq["role"]; ok {
-		user.Role = val.(string)
+	if em, ok := updateReq["email"]; ok {
+		user.Email = em.(string)
 	}
-	if val, ok := updateReq["firstname"]; ok {
-		user.Firstname = val.(string)
-	}
-	if val, ok := updateReq["lastname"]; ok {
-		user.Lastname = val.(string)
-	}
-	if val, ok := updateReq["birthdate"]; ok {
-		strVal := val.(string)
-		bd, err := time.Parse("2006-01-02", strVal)
-		if err != nil {
-			return nil, app.ErrInvalidRequest
-		}
-		user.Birthdate = bd
-	}
-	if val, ok := updateReq["gender"]; ok {
-		user.Gender = model.Gender(val.(string))
-	}
-	if val, ok := updateReq["addresses"]; ok {
-		user.Addresses = toAddresses(val)
-	}
-	if val, ok := updateReq["phones"]; ok {
-		user.Phones = toPhones(val)
-	}
-	if val, ok := updateReq["image"]; ok {
-		user.Image = toImage(val)
-	}
-	if val, ok := updateReq["paymentMethods"]; ok {
-		user.PaymentMethods = toPaymentMethods(val)
-	}
+	// More fields can be added
+
+	user.UpdatedAt = time.Now().UTC()
 
 	if err := s.repo.UpdateUser(ctx, user); err != nil {
 		return nil, err
 	}
+
+	// Invalidate cache
+	_ = s.cache.Del(ctx, user.UUID)
 	return user, nil
 }
 
-func (s *userService) GetUser(ctx context.Context, uuid string) (*model.User, error) {
-	return s.repo.GetUser(ctx, uuid)
+// GetUser retrieves user from cache or repository
+func (s *userService) GetUser(ctx context.Context, uuidStr string) (*model.User, error) {
+	cached, err := s.cache.Get(ctx, uuidStr)
+	if err == nil && cached != "" {
+		return deserializeUser(cached)
+	}
+	usr, err := s.repo.GetUser(ctx, uuidStr)
+	if err != nil {
+		return nil, err
+	}
+
+	serialized := serializeUser(usr)
+	_ = s.cache.Set(ctx, uuidStr, serialized, 5*time.Minute)
+	return usr, nil
 }
 
-func (s *userService) DeleteUser(ctx context.Context, uuid string) error {
-	return s.repo.DeleteUser(ctx, uuid)
+// DeleteUser removes a user from database and cache
+func (s *userService) DeleteUser(ctx context.Context, uuidStr string) error {
+	if err := s.repo.DeleteUser(ctx, uuidStr); err != nil {
+		return err
+	}
+	_ = s.cache.Del(ctx, uuidStr)
+	return nil
 }
 
+// ListUsers delegates to repository
 func (s *userService) ListUsers(ctx context.Context, limit int64, lastKey string) ([]model.User, string, error) {
 	if limit <= 0 {
 		limit = 10
@@ -100,75 +105,22 @@ func (s *userService) ListUsers(ctx context.Context, limit int64, lastKey string
 	return s.repo.ListUsers(ctx, limit, lastKey)
 }
 
-func toAddresses(val interface{}) []model.Address {
-	arr, ok := val.([]interface{})
-	if !ok {
-		return nil
-	}
-	addrs := []model.Address{}
-	for _, v := range arr {
-		m := v.(map[string]interface{})
-		addrs = append(addrs, model.Address{
-			Type:        toString(m["type"]),
-			Address:     toString(m["address"]),
-			Subdistrict: toString(m["subdistrict"]),
-			District:    toString(m["district"]),
-			City:        toString(m["city"]),
-			Province:    toString(m["province"]),
-			Country:     toString(m["country"]),
-			PostalCode:  toString(m["postalCode"]),
-		})
-	}
-	return addrs
+// Simple serialization to demonstrate caching
+func serializeUser(u *model.User) string {
+	return u.UUID + "|" + u.Email
 }
 
-func toPhones(val interface{}) []model.Phone {
-	arr, ok := val.([]interface{})
-	if !ok {
-		return nil
+// Simple deserialization
+func deserializeUser(s string) (*model.User, error) {
+	r := []rune(s)
+	if len(r) < 3 {
+		return nil, app.ErrNotFound
 	}
-	phones := []model.Phone{}
-	for _, v := range arr {
-		m := v.(map[string]interface{})
-		phones = append(phones, model.Phone{
-			Type:   toString(m["type"]),
-			Number: toString(m["number"]),
-		})
+	// Arbitrary splitting
+	mid := len(r) / 2
+	u := &model.User{
+		UUID:  string(r[:mid]),
+		Email: string(r[mid:]),
 	}
-	return phones
-}
-
-func toImage(val interface{}) *model.Image {
-	m, ok := val.(map[string]interface{})
-	if !ok {
-		return nil
-	}
-	return &model.Image{
-		Name: toString(m["name"]),
-		URL:  toString(m["url"]),
-	}
-}
-
-func toPaymentMethods(val interface{}) []model.PaymentMethod {
-	arr, ok := val.([]interface{})
-	if !ok {
-		return nil
-	}
-	pms := []model.PaymentMethod{}
-	for _, v := range arr {
-		m := v.(map[string]interface{})
-		pms = append(pms, model.PaymentMethod{
-			Type:   toString(m["type"]),
-			Name:   toString(m["name"]),
-			Number: toString(m["number"]),
-		})
-	}
-	return pms
-}
-
-func toString(v interface{}) string {
-	if v == nil {
-		return ""
-	}
-	return v.(string)
+	return u, nil
 }

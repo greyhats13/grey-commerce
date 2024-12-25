@@ -33,6 +33,10 @@ func (z *zapLogger) Info(msg string, fields ...Field) {
 	z.logger.Info(msg, convertFields(fields)...)
 }
 
+func (z *zapLogger) Warn(msg string, fields ...Field) {
+	z.logger.Warn(msg, convertFields(fields)...)
+}
+
 func (z *zapLogger) Error(msg string, fields ...Field) {
 	z.logger.Error(msg, convertFields(fields)...)
 }

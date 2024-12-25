@@ -12,6 +12,11 @@ type Config struct {
 	RedisAddr     string
 	RedisPassword string
 	Port          string
+	MySQLUser     string
+	MySQLPassword string
+	MySQLHost     string
+	MySQLPort     string
+	MySQLDBName   string
 }
 
 func LoadConfig() (*Config, error) {
@@ -20,9 +25,10 @@ func LoadConfig() (*Config, error) {
 
 	// Defaults
 	viper.SetDefault("PORT", "8080")
+	viper.SetDefault("MYSQL_PORT", "3306")
 
 	if err := viper.ReadInConfig(); err != nil {
-		// It's okay if config file not found
+		
 	}
 
 	cfg := &Config{
@@ -31,6 +37,11 @@ func LoadConfig() (*Config, error) {
 		RedisAddr:     viper.GetString("REDIS_ADDR"),
 		RedisPassword: viper.GetString("REDIS_PASSWORD"),
 		Port:          viper.GetString("PORT"),
+		MySQLUser:     viper.GetString("MYSQL_USER"),
+		MySQLPassword: viper.GetString("MYSQL_PASSWORD"),
+		MySQLHost:     viper.GetString("MYSQL_HOST"),
+		MySQLPort:     viper.GetString("MYSQL_PORT"),
+		MySQLDBName:   viper.GetString("MYSQL_DB_NAME"),
 	}
 
 	return cfg, nil
