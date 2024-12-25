@@ -28,19 +28,19 @@ func NewUserHandler(s service.UserService) *UserHandler {
 func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	var user model.User
 	if err := c.BodyParser(&user); err != nil {
-		return fiber.NewError(http.StatusBadRequest, app.ErrFailedToParse.Error())
+		return fiber.NewError(http.StatusBadRequest, errors.ErrFailedToParse.Error())
 	}
 
 	// Validate struct fields
 	if err := validate.Struct(user); err != nil {
-		return fiber.NewError(http.StatusBadRequest, app.ErrFailedToValidate.Error())
+		return fiber.NewError(http.StatusBadRequest, errors.ErrFailedToValidate.Error())
 	}
 
 	if err := h.service.CreateUser(c.Context(), &user); err != nil {
-		if err == app.ErrInvalidRequest {
-			return fiber.NewError(http.StatusBadRequest, app.ErrFailedToParse.Error())
-		} else if err == app.ErrFailedToValidate {
-			return fiber.NewError(http.StatusBadRequest, app.ErrFailedToValidate.Error())
+		if err == errors.ErrInvalidRequest {
+			return fiber.NewError(http.StatusBadRequest, errors.ErrFailedToParse.Error())
+		} else if err == errors.ErrFailedToValidate {
+			return fiber.NewError(http.StatusBadRequest, errors.ErrFailedToValidate.Error())
 		}
 		return fiber.NewError(http.StatusInternalServerError, err.Error())
 	}
@@ -58,12 +58,12 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	// We will parse into a map instead of a full User struct
 	var updateReq map[string]interface{}
 	if err := c.BodyParser(&updateReq); err != nil {
-		return fiber.NewError(http.StatusBadRequest, app.ErrInvalidRequest.Error())
+		return fiber.NewError(http.StatusBadRequest, errors.ErrInvalidRequest.Error())
 	}
 
 	user, err := h.service.UpdateUser(c.Context(), uuidParam, updateReq)
 	if err != nil {
-		if err == app.ErrNotFound {
+		if err == errors.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
 		}
 		return fiber.NewError(http.StatusInternalServerError, err.Error())
@@ -79,7 +79,7 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 	}
 	user, err := h.service.GetUser(c.Context(), uuid)
 	if err != nil {
-		if err == app.ErrNotFound {
+		if err == errors.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
 		}
 		return fiber.NewError(http.StatusInternalServerError, err.Error())
@@ -94,7 +94,7 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, "uuid is required")
 	}
 	if err := h.service.DeleteUser(c.Context(), uuid); err != nil {
-		if err == app.ErrNotFound {
+		if err == errors.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
 		}
 		return fiber.NewError(http.StatusInternalServerError, err.Error())

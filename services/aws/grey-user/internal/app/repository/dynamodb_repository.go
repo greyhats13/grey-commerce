@@ -4,7 +4,7 @@ package repository
 
 import (
 	"context"
-	"grey-user/internal/app"
+	errors "grey-user/internal/app"
 	"grey-user/internal/app/model"
 	"grey-user/pkg/databases"
 	"time"
@@ -41,7 +41,7 @@ func (r *DynamoDBUserRepository) CreateUser(ctx context.Context, user *model.Use
 // UpdateUser updates an existing user in DynamoDB
 func (r *DynamoDBUserRepository) UpdateUser(ctx context.Context, user *model.User) error {
 	if user.UUID == "" {
-		return app.ErrInvalidRequest
+		return errors.ErrInvalidRequest
 	}
 	user.UpdatedAt = time.Now().UTC()
 	return r.db.PutItem(ctx, user, nil, r.table)
@@ -50,7 +50,7 @@ func (r *DynamoDBUserRepository) UpdateUser(ctx context.Context, user *model.Use
 // GetUser retrieves a user by UUID from DynamoDB
 func (r *DynamoDBUserRepository) GetUser(ctx context.Context, uuidStr string) (*model.User, error) {
 	if uuidStr == "" {
-		return nil, app.ErrInvalidRequest
+		return nil, errors.ErrInvalidRequest
 	}
 	key := map[string]interface{}{
 		"uuid": uuidStr,
@@ -58,7 +58,7 @@ func (r *DynamoDBUserRepository) GetUser(ctx context.Context, uuidStr string) (*
 	res, err := r.db.GetItem(ctx, key, r.table)
 	if err != nil {
 		if err.Error() == "not found" {
-			return nil, app.ErrNotFound
+			return nil, errors.ErrNotFound
 		}
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (r *DynamoDBUserRepository) GetUser(ctx context.Context, uuidStr string) (*
 // DeleteUser deletes a user from DynamoDB by UUID
 func (r *DynamoDBUserRepository) DeleteUser(ctx context.Context, uuidStr string) error {
 	if uuidStr == "" {
-		return app.ErrInvalidRequest
+		return errors.ErrInvalidRequest
 	}
 	key := map[string]interface{}{
 		"uuid": uuidStr,

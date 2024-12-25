@@ -1,4 +1,4 @@
-// File: pkg/databases/database.go
+// Path: pkg/databases/database.go
 package databases
 
 import (

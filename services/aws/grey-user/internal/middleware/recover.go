@@ -7,6 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
-func NewRecoverMiddleware() fiber.Handler {
+func RecoverMiddleware() fiber.Handler {
 	return recover.New()
 }
