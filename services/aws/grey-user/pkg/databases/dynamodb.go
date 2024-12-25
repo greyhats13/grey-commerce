@@ -2,9 +2,8 @@ package databases
 
 import (
 	"grey-user/internal/config"
+    "grey-user/pkg/aws/session"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
@@ -15,13 +14,10 @@ type DynamoDBClient struct {
 
 // NewDynamoDBClient creates a DynamoDBClient
 func NewDynamoDBClient(cfg *config.Config) (*DynamoDBClient, error) {
-	// Initialize AWS session
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String(cfg.AWSRegion),
-	})
-	if err != nil {
-		return nil, err
-	}
-	db := dynamodb.New(sess)
-	return &DynamoDBClient{Client: db}, nil
+    sess, err := session.NewAWSSession(cfg)
+    if err != nil {
+        return nil, err
+    }
+    db := dynamodb.New(sess)
+    return &DynamoDBClient{Client: db}, nil
 }

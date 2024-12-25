@@ -20,6 +20,8 @@ nameOverride: ""
 fullnameOverride: ""
 
 appConfig:
+  APP_NAME: "grey-svc-user"
+  APP_ENV: "local"
   AWS_REGION: "ap-southeast-1"
   DYNAMODB_TABLE: "grey-svc-user"
   REDIS_ADDR: "redis-master.redis.svc.cluster.local:6379"
