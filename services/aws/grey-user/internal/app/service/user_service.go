@@ -29,10 +29,10 @@ func NewUserService(repo repository.UserRepository, cache cache.Cache) UserServi
 
 func (s *userService) CreateUser(ctx context.Context, user *model.User) error {
 	if user.ShopID == "" || user.Email == "" || user.Role == "" ||
-		user.Firstname == "" || user.Lastname == "" || user.Birthdate.IsZero() ||
-		user.Gender == "" || len(user.Addresses) == 0 || len(user.Phones) == 0 {
+		user.Firstname == "" || user.Lastname == "" || user.Gender == "" {
 		return errors.ErrInvalidRequest
 	}
+
 	return s.repo.CreateUser(ctx, user)
 }
 

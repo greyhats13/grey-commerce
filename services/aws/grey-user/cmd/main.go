@@ -47,12 +47,12 @@ func main() {
 	// Dependency injection for service
 	userService := service.NewUserService(userRepo, redisCache)
 
-	// Create Fiber with our custom error handler
+	// Create Fiber with custom JSON encoder/decoder and error handler
 	app := fiber.New(fiber.Config{
 		JSONEncoder: utils.JSONMarshal,
 		JSONDecoder: utils.JSONUnmarshal,
 
-		// Use our custom error handler
+		// Use custom error handler
 		ErrorHandler: middleware.CustomErrorHandler,
 	})
 
