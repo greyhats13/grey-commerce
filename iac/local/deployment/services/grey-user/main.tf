@@ -29,6 +29,8 @@ module "secrets_manager" {
   ignore_secret_changes = false
   secret_string = jsonencode({
     REDIS_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.iac.secret_string)["REDIS_PASSWORD"]
+    AWS_ACCESS_KEY_ID = "test"
+    AWS_SECRET_ACCESS_KEY = "test"
   })
 
   tags = merge(local.tags, local.svc_standard)

@@ -24,8 +24,9 @@ appConfig:
   DYNAMODB_TABLE: "grey-svc-user"
   REDIS_ADDR: "redis-master.redis.svc.cluster.local:6379"
   REDIS_DB: "0"
+  REDIS_TTL: "3600"
   PORT: "8080"
-
+  LOCAL_STACK_ENDPOINT: "http://localstack:4566"
 
 # appSecret: {}
 #   secrets:
@@ -42,6 +43,14 @@ externalSecrets:
     REDIS_PASSWORD:
       key: "grey/svc/user"
       property: "REDIS_PASSWORD"
+      version: "AWSCURRENT"
+    AWS_ACCESS_KEY_ID:
+      key: "grey/svc/user"
+      property: "AWS_ACCESS_KEY_ID"
+      version: "AWSCURRENT"
+    AWS_SECRET_ACCESS_KEY:
+      key: "grey/svc/user"
+      property: "AWS_SECRET_ACCESS_KEY"
       version: "AWSCURRENT"
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
