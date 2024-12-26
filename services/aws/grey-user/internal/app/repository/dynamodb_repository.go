@@ -34,7 +34,7 @@ func (r *DynamoDBUserRepository) CreateUser(ctx context.Context, user *model.Use
 	user.CreatedAt = now
 	user.UpdatedAt = now
 
-	cond := "attribute_not_exists(uuid)" // ensures we don't overwrite existing user
+	cond := "attribute_not_exists(userId)" // ensures we don't overwrite existing user
 	return r.db.PutItem(ctx, user, &cond, r.table)
 }
 

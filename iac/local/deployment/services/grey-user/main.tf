@@ -41,7 +41,7 @@ module "dynamodb_table" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
   name                = local.svc_naming_standard
-  hash_key            = "uuid"
+  hash_key            = "userId"
   billing_mode        = "PROVISIONED"
   read_capacity       = 5
   write_capacity      = 5
@@ -50,7 +50,7 @@ module "dynamodb_table" {
   # Definisi Atribut Tabel Utama dan GSIs
   attributes = [
     {
-      name = "uuid"
+      name = "userId"
       type = "S"
     },
     {
