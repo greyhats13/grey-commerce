@@ -5,7 +5,6 @@ package middleware
 import (
 	"errors"
 	"runtime/debug"
-	"strconv"
 
 	"github.com/aws/smithy-go"
 	"github.com/gofiber/fiber/v2"
@@ -22,19 +21,14 @@ func CustomErrorHandler(c *fiber.Ctx, err error) error {
 	var e *fiber.Error
 	if errors.As(err, &e) {
 		code = e.Code
-		var ae smithy.APIError
-		if errors.As(err, &ae) {
-			var errCode = ae.ErrorCode()
+		var oe *smithy.OperationError
+		if errors.As(err, &oe) {
 			// convert awsStatus to int
-			awsStatus, err := strconv.Atoi(errCode)
-			if err != nil {
-				panic(err)
-			}
-
 			debug.PrintStack()
-			return c.Status(int(awsStatus)).JSON(fiber.Map{
-				"type":    "cloudsdk",
-				"message": ae.ErrorMessage(),
+			return c.Status(int(e.Code)).JSON(fiber.Map{
+				"type":      "cloudsdk",
+				"service":   oe.Service(),
+				"operation": oe.Operation(),
 			})
 		}
 	}

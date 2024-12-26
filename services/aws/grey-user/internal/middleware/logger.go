@@ -30,7 +30,7 @@ func ZapLoggerMiddleware(log logger.Logger) fiber.Handler {
 
 		// Continue to next middleware or actual route
 		err := c.Next()
-    
+
 		// Retrieve final status code: if err != nil, we check if it's a fiber.Error
 		status := c.Response().StatusCode() // Default if no fiber.Error is found
 
