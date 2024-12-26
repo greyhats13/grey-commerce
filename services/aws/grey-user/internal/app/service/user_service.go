@@ -54,7 +54,7 @@ func (s *userService) UpdateUser(ctx context.Context, uuidStr string, updateReq 
 	if err := s.repo.UpdateUser(ctx, user); err != nil {
 		return nil, err
 	}
-	_ = s.cache.Del(ctx, user.UUID)
+	_ = s.cache.Del(ctx, user.UserId)
 	return user, nil
 }
 
@@ -88,7 +88,7 @@ func (s *userService) ListUsers(ctx context.Context, limit int32, lastKey string
 }
 
 func serializeUser(u *model.User) string {
-	return u.UUID + "|" + u.Email // minimal example; ideally JSON
+	return u.UserId + "|" + u.Email // minimal example; ideally JSON
 }
 
 func deserializeUser(s string) (*model.User, error) {
@@ -98,8 +98,8 @@ func deserializeUser(s string) (*model.User, error) {
 	}
 	// naive
 	user := &model.User{
-		UUID:  string(parts[0 : len(parts)/2]),
-		Email: string(parts[len(parts)/2:]),
+		UserId: string(parts[0 : len(parts)/2]),
+		Email:  string(parts[len(parts)/2:]),
 	}
 	return user, nil
 }

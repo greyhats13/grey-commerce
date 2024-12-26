@@ -8,7 +8,7 @@ import (
 
 // User represents a user in the system with validation tags.
 type User struct {
-	UUID           string          `json:"uuid" dynamodbav:"uuid"`
+	UserId         string          `json:"userId" dynamodbav:"userId"`
 	ShopID         string          `json:"shopId" dynamodbav:"shopId" validate:"required"`
 	Email          string          `json:"email" dynamodbav:"email" validate:"required,email"`
 	Role           string          `json:"role" dynamodbav:"role" validate:"required"`

@@ -29,7 +29,7 @@ func NewDynamoDBUserRepository(db databases.Database, table string) UserReposito
 
 // CreateUser creates a new user in DynamoDB
 func (r *DynamoDBUserRepository) CreateUser(ctx context.Context, user *model.User) error {
-	user.UUID = uuid.New().String()
+	user.UserId = uuid.New().String()
 	now := time.Now().UTC()
 	user.CreatedAt = now
 	user.UpdatedAt = now
@@ -40,7 +40,7 @@ func (r *DynamoDBUserRepository) CreateUser(ctx context.Context, user *model.Use
 
 // UpdateUser updates an existing user in DynamoDB
 func (r *DynamoDBUserRepository) UpdateUser(ctx context.Context, user *model.User) error {
-	if user.UUID == "" {
+	if user.UserId == "" {
 		return errors.ErrInvalidRequest
 	}
 	user.UpdatedAt = time.Now().UTC()
