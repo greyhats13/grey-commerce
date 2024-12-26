@@ -26,10 +26,12 @@ func ZapLoggerMiddleware(log logger.Logger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Record start time and read the request body size
 		start := time.Now()
-		requestSize := len(c.Request().Body())
-
 		// Continue to next middleware or actual route
 		err := c.Next()
+		// End time for latency
+		stop := time.Now()
+
+		requestSize := len(c.Request().Body())
 
 		// Retrieve final status code: if err != nil, we check if it's a fiber.Error
 		status := c.Response().StatusCode() // Default if no fiber.Error is found
@@ -44,9 +46,6 @@ func ZapLoggerMiddleware(log logger.Logger) fiber.Handler {
 				status = fiber.StatusInternalServerError
 			}
 		}
-
-		// End time for latency
-		stop := time.Now()
 
 		// Determine severity
 		severity := "INFO"
