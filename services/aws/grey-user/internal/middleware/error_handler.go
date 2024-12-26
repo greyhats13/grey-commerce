@@ -5,9 +5,8 @@ package middleware
 import (
 	"errors"
 	"runtime/debug"
-	"strconv"
 
-	"github.com/aws/smithy-go"
+	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -22,20 +21,17 @@ func CustomErrorHandler(c *fiber.Ctx, err error) error {
 	var e *fiber.Error
 	if errors.As(err, &e) {
 		code = e.Code
-		var ae smithy.APIError
-		var errCode = ae.ErrorCode()
-		// convert awsStatus to int
-		awsStatus, err := strconv.Atoi(errCode)
-		if err != nil {
-			panic(err)
+		var re *awshttp.ResponseError
+		if errors.As(err, &re) {
+			// Return a JSON response consistent for all errors
+			debug.PrintStack()
+			return c.Status(re.HTTPStatusCode()).JSON(fiber.Map{
+				"success": false,
+				"message": err.Error(),
+			})
 		}
-
-		debug.PrintStack()
-		return c.Status(int(awsStatus)).JSON(fiber.Map{
-			"type":    "cloudsdk",
-			"message": ae.ErrorMessage(),
-		})
 	}
+
 	// Example: Log stacktrace if it's a 5xx error
 	if code >= 500 {
 		// For demonstration, printing stacktrace to the console.
@@ -45,7 +41,7 @@ func CustomErrorHandler(c *fiber.Ctx, err error) error {
 
 	// Return a JSON response consistent for all errors
 	return c.Status(code).JSON(fiber.Map{
-		"type":    "app",
+		"success": false,
 		"message": err.Error(),
 	})
 }
