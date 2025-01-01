@@ -6,7 +6,6 @@ import (
 	"errors"
 	"runtime/debug"
 
-	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -21,15 +20,6 @@ func CustomErrorHandler(c *fiber.Ctx, err error) error {
 	var e *fiber.Error
 	if errors.As(err, &e) {
 		code = e.Code
-		var re *awshttp.ResponseError
-		if errors.As(err, &re) {
-			// Return a JSON response consistent for all errors
-			debug.PrintStack()
-			return c.Status(re.HTTPStatusCode()).JSON(fiber.Map{
-				"success": false,
-				"message": err.Error(),
-			})
-		}
 	}
 
 	// Example: Log stacktrace if it's a 5xx error
