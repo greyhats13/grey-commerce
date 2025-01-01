@@ -5,9 +5,8 @@ package middleware
 import (
 	"errors"
 	"runtime/debug"
-	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -22,13 +21,13 @@ func CustomErrorHandler(c *fiber.Ctx, err error) error {
 	var e *fiber.Error
 	if errors.As(err, &e) {
 		code = e.Code
-		var re s3.responseSizeError
+		var re *awshttp.ResponseError
 		if errors.As(err, &re) {
 			// Return a JSON response consistent for all errors
 			debug.PrintStack()
 			return c.Status(re.HTTPStatusCode()).JSON(fiber.Map{
 				"success": false,
-				"message": strings.Split(err.Error(), ","),
+				"message": err.Error(),
 			})
 		}
 	}
