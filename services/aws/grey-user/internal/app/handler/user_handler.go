@@ -57,9 +57,9 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 
 // UpdateUser handles updating of an existing user
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
-	uuidParam := c.Params("uuid")
-	if uuidParam == "" {
-		return fiber.NewError(http.StatusBadRequest, "uuid is required")
+	userIdParam := c.Params("userId")
+	if userIdParam == "" {
+		return fiber.NewError(http.StatusBadRequest, "userId is required")
 	}
 
 	var updateReq map[string]interface{}
@@ -67,7 +67,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusBadRequest, errors.ErrInvalidRequest.Error())
 	}
 
-	user, err := h.service.UpdateUser(c.Context(), uuidParam, updateReq)
+	user, err := h.service.UpdateUser(c.Context(), userIdParam, updateReq)
 	if err != nil {
 		if err == errors.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
@@ -77,14 +77,14 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
-// GetUser retrieves a user by UUID
+// GetUser retrieves a user by userId
 func (h *UserHandler) GetUser(c *fiber.Ctx) error {
-	uuidParam := c.Params("uuid")
-	if uuidParam == "" {
-		return fiber.NewError(http.StatusBadRequest, "uuid is required")
+	userIdParam := c.Params("userId")
+	if userIdParam == "" {
+		return fiber.NewError(http.StatusBadRequest, "userId is required")
 	}
 
-	user, err := h.service.GetUser(c.Context(), uuidParam)
+	user, err := h.service.GetUser(c.Context(), userIdParam)
 	if err != nil {
 		if err == errors.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
@@ -94,14 +94,14 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
-// DeleteUser deletes a user by UUID
+// DeleteUser deletes a user by userId
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
-	uuidParam := c.Params("uuid")
-	if uuidParam == "" {
-		return fiber.NewError(http.StatusBadRequest, "uuid is required")
+	userIdParam := c.Params("userId")
+	if userIdParam == "" {
+		return fiber.NewError(http.StatusBadRequest, "userId is required")
 	}
 
-	if err := h.service.DeleteUser(c.Context(), uuidParam); err != nil {
+	if err := h.service.DeleteUser(c.Context(), userIdParam); err != nil {
 		if err == errors.ErrNotFound {
 			return fiber.NewError(http.StatusNotFound, err.Error())
 		}

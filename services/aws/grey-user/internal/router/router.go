@@ -16,8 +16,8 @@ func SetupRoutes(app *fiber.App, zapLogger logger.Logger, userService service.Us
 	v1 := app.Group("/v1")
 	userGroup := v1.Group("/user")
 	userGroup.Post("/", userHandler.CreateUser)
-	userGroup.Patch("/:uuid", userHandler.UpdateUser)
-	userGroup.Get("/:uuid", userHandler.GetUser)
-	userGroup.Delete("/:uuid", userHandler.DeleteUser)
+	userGroup.Patch("/:userId", userHandler.UpdateUser)
+	userGroup.Get("/:userId", userHandler.GetUser)
+	userGroup.Delete("/:userId", userHandler.DeleteUser)
 	userGroup.Get("/", userHandler.ListUsers)
 }

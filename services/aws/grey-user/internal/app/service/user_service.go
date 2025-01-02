@@ -1,4 +1,5 @@
-// Path: internal/app/service/user_service.go
+// Path: grey-user/internal/app/service/user_service.go
+
 package service
 
 import (
@@ -12,9 +13,9 @@ import (
 
 type UserService interface {
 	CreateUser(ctx context.Context, user *model.User) error
-	UpdateUser(ctx context.Context, uuid string, updateReq map[string]interface{}) (*model.User, error)
-	GetUser(ctx context.Context, uuid string) (*model.User, error)
-	DeleteUser(ctx context.Context, uuid string) error
+	UpdateUser(ctx context.Context, userId string, updateReq map[string]interface{}) (*model.User, error)
+	GetUser(ctx context.Context, userId string) (*model.User, error)
+	DeleteUser(ctx context.Context, userId string) error
 	ListUsers(ctx context.Context, limit int32, lastKey string) ([]model.User, string, error)
 }
 
@@ -36,8 +37,8 @@ func (s *userService) CreateUser(ctx context.Context, user *model.User) error {
 	return s.repo.CreateUser(ctx, user)
 }
 
-func (s *userService) UpdateUser(ctx context.Context, uuidStr string, updateReq map[string]interface{}) (*model.User, error) {
-	user, err := s.repo.GetUser(ctx, uuidStr)
+func (s *userService) UpdateUser(ctx context.Context, userId string, updateReq map[string]interface{}) (*model.User, error) {
+	user, err := s.repo.GetUser(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -58,25 +59,25 @@ func (s *userService) UpdateUser(ctx context.Context, uuidStr string, updateReq 
 	return user, nil
 }
 
-func (s *userService) GetUser(ctx context.Context, uuidStr string) (*model.User, error) {
-	cached, err := s.cache.Get(ctx, uuidStr)
+func (s *userService) GetUser(ctx context.Context, userId string) (*model.User, error) {
+	cached, err := s.cache.Get(ctx, userId)
 	if err == nil && cached != "" {
 		return deserializeUser(cached)
 	}
-	user, err := s.repo.GetUser(ctx, uuidStr)
+	user, err := s.repo.GetUser(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 	serialized := serializeUser(user)
-	_ = s.cache.Set(ctx, uuidStr, serialized, 5*time.Minute)
+	_ = s.cache.Set(ctx, userId, serialized, 5*time.Minute)
 	return user, nil
 }
 
-func (s *userService) DeleteUser(ctx context.Context, uuidStr string) error {
-	if err := s.repo.DeleteUser(ctx, uuidStr); err != nil {
+func (s *userService) DeleteUser(ctx context.Context, userId string) error {
+	if err := s.repo.DeleteUser(ctx, userId); err != nil {
 		return err
 	}
-	_ = s.cache.Del(ctx, uuidStr)
+	_ = s.cache.Del(ctx, userId)
 	return nil
 }
 

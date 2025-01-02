@@ -101,7 +101,7 @@ func (d *dynamoDBDatabase) QueryItems(ctx context.Context, tableName string, lim
 	// If lastKey is provided, set the ExclusiveStartKey
 	if lastKey != "" {
 		input.ExclusiveStartKey = map[string]types.AttributeValue{
-			"uuid": &types.AttributeValueMemberS{Value: lastKey},
+			"userId": &types.AttributeValueMemberS{Value: lastKey},
 		}
 	}
 
@@ -123,7 +123,7 @@ func (d *dynamoDBDatabase) QueryItems(ctx context.Context, tableName string, lim
 	// Get the next key if present
 	next := ""
 	if len(res.LastEvaluatedKey) > 0 {
-		if val, ok := res.LastEvaluatedKey["uuid"].(*types.AttributeValueMemberS); ok {
+		if val, ok := res.LastEvaluatedKey["userId"].(*types.AttributeValueMemberS); ok {
 			next = val.Value
 		}
 	}

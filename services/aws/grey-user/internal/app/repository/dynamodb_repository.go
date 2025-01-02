@@ -47,15 +47,14 @@ func (r *DynamoDBUserRepository) UpdateUser(ctx context.Context, user *model.Use
 	return r.db.PutItem(ctx, user, nil, r.table)
 }
 
-// GetUser retrieves a user by UUID from DynamoDB
-func (r *DynamoDBUserRepository) GetUser(ctx context.Context, uuidStr string) (*model.User, error) {
-	if uuidStr == "" {
+// GetUser retrieves a user by userId from DynamoDB
+func (r *DynamoDBUserRepository) GetUser(ctx context.Context, userId string) (*model.User, error) {
+	if userId == "" {
 		return nil, errors.ErrInvalidRequest
 	}
 	key := map[string]interface{}{
-		"uuid": uuidStr,
+		"userId": userId,
 	}
-	// db.GetItem returns a map[string]interface{} if the item is found
 	res, err := r.db.GetItem(ctx, key, r.table)
 	if err != nil {
 		// Check if the error is "not found"
@@ -80,13 +79,13 @@ func (r *DynamoDBUserRepository) GetUser(ctx context.Context, uuidStr string) (*
 	return &user, nil
 }
 
-// DeleteUser deletes a user from DynamoDB by UUID
-func (r *DynamoDBUserRepository) DeleteUser(ctx context.Context, uuidStr string) error {
-	if uuidStr == "" {
+// DeleteUser deletes a user from DynamoDB by userId
+func (r *DynamoDBUserRepository) DeleteUser(ctx context.Context, userId string) error {
+	if userId == "" {
 		return errors.ErrInvalidRequest
 	}
 	key := map[string]interface{}{
-		"uuid": uuidStr,
+		"userId": userId,
 	}
 	return r.db.DeleteItem(ctx, key, r.table)
 }
