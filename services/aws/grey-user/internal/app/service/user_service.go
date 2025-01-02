@@ -8,6 +8,7 @@ import (
 	"grey-user/internal/app/model"
 	"grey-user/internal/app/repository"
 	"grey-user/pkg/cache"
+	"grey-user/pkg/utils"
 	"time"
 )
 
@@ -42,14 +43,14 @@ func (s *userService) UpdateUser(ctx context.Context, userId string, updateReq m
 	if err != nil {
 		return nil, err
 	}
-	// apply updates
+	// Apply updates
 	if fn, ok := updateReq["firstname"]; ok {
 		user.Firstname = fn.(string)
 	}
 	if ln, ok := updateReq["lastname"]; ok {
 		user.Lastname = ln.(string)
 	}
-	// add more fields if needed
+	// Tambahkan field lain jika diperlukan
 	user.UpdatedAt = time.Now().UTC()
 
 	if err := s.repo.UpdateUser(ctx, user); err != nil {
@@ -68,7 +69,11 @@ func (s *userService) GetUser(ctx context.Context, userId string) (*model.User, 
 	if err != nil {
 		return nil, err
 	}
-	serialized := serializeUser(user)
+	serialized, err := serializeUser(user)
+	if err != nil {
+		// Jika serialisasi gagal, jangan set ke cache
+		return user, nil
+	}
 	_ = s.cache.Set(ctx, userId, serialized, 5*time.Minute)
 	return user, nil
 }
@@ -88,19 +93,19 @@ func (s *userService) ListUsers(ctx context.Context, limit int32, lastKey string
 	return s.repo.ListUsers(ctx, limit, lastKey)
 }
 
-func serializeUser(u *model.User) string {
-	return u.UserId + "|" + u.Email // minimal example; ideally JSON
+func serializeUser(u *model.User) (string, error) {
+	bytes, err := utils.JSONMarshal(u)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }
 
 func deserializeUser(s string) (*model.User, error) {
-	parts := []rune(s)
-	if len(parts) < 2 {
+	var user model.User
+	err := utils.JSONUnmarshal([]byte(s), &user)
+	if err != nil {
 		return nil, errors.ErrNotFound
 	}
-	// naive
-	user := &model.User{
-		UserId: string(parts[0 : len(parts)/2]),
-		Email:  string(parts[len(parts)/2:]),
-	}
-	return user, nil
+	return &user, nil
 }

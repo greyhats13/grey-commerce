@@ -4,6 +4,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	errors "grey-user/internal/app"
 	"grey-user/internal/app/model"
@@ -110,7 +111,22 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	return c.SendStatus(http.StatusNoContent)
 }
 
-// ListUsers is just an example; feel free to implement
+// ListUsers retrieves a list of users with pagination
 func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
-	return fiber.NewError(http.StatusNotImplemented, "list users not implemented")
+	limitParam := c.Query("limit", "10") // default limit 10
+	limit, err := strconv.Atoi(limitParam)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest, "invalid limit parameter")
+	}
+	lastKey := c.Query("lastKey", "")
+	users, nextKey, err := h.service.ListUsers(c.Context(), int32(limit), lastKey)
+	if err != nil {
+		return fiber.NewError(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(fiber.Map{
+		"success":  true,
+		"users":    users,
+		"nextKey":  nextKey,
+		"pageSize": limit,
+	})
 }
