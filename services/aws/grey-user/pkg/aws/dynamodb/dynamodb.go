@@ -1,6 +1,6 @@
-// Path: grey-user/pkg/databases/dynamodb.go
+// Path: grey-user/pkg/aws/dynamodb/dynamodb.go
 
-package databases
+package dynamodb
 
 import (
 	"grey-user/internal/config"

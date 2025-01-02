@@ -6,6 +6,8 @@ import (
 	"context"
 	"fmt"
 
+	client "grey-user/pkg/aws/dynamodb"
+
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
@@ -13,11 +15,11 @@ import (
 
 // dynamoDBDatabase is an implementation of the Database interface for AWS SDK v2
 type dynamoDBDatabase struct {
-	client *DynamoDBClient
+	client *client.DynamoDBClient
 }
 
 // NewDynamoDBDatabase returns a struct implementing the Database interface
-func NewDynamoDBDatabase(client *DynamoDBClient) Database {
+func NewDynamoDBDatabase(client *client.DynamoDBClient) Database {
 	return &dynamoDBDatabase{client: client}
 }
 

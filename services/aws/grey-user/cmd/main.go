@@ -10,6 +10,7 @@ import (
 	"grey-user/internal/config"
 	"grey-user/internal/middleware"
 	"grey-user/internal/router"
+  "grey-user/pkg/aws/dynamodb"
 	"grey-user/pkg/cache"
 	"grey-user/pkg/databases"
 	"grey-user/pkg/logger"
@@ -30,7 +31,7 @@ func main() {
 	}
 
 	// Initialize DynamoDB
-	dynamoClient, err := databases.NewDynamoDBClient(cfg)
+	dynamoClient, err := dynamodb.NewDynamoDBClient(cfg)
 	if err != nil {
 		zapLogger.Fatal("failed to create DynamoDB client", err)
 	}

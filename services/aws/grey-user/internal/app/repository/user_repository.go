@@ -1,4 +1,4 @@
-// Path: grey-user/internal/app/repository/user_repository.go
+// Path: grey-user/internal/app/repository/repository.go
 
 package repository
 

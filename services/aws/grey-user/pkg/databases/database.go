@@ -1,4 +1,4 @@
-// Path: pkg/databases/database.go
+// Path: grey-user/pkg/databases/database.go
 package databases
 
 import (
