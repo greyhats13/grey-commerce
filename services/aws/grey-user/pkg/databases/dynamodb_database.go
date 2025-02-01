@@ -92,7 +92,7 @@ func (d *dynamoDBDatabase) DeleteItem(ctx context.Context, key map[string]interf
 
 // QueryItems scans items from a DynamoDB table (renamed from Query to Scan for brevity)
 func (d *dynamoDBDatabase) QueryItems(ctx context.Context, tableName string, limit int32, lastKey string) ([]map[string]interface{}, string, error) {
-	// We're using Scan here; if you need a more refined Query, you'll adapt accordingly
+	// Using scan instead of query for simplicity
 	input := &dynamodb.ScanInput{
 		TableName: awsString(tableName),
 		Limit:     &limit,

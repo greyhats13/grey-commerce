@@ -37,7 +37,7 @@ func NewAWSSession(cfg *config.Config) (aws.Config, error) {
 		sdkConfig.WithRegion(cfg.AWSRegion),
 	}
 
-	// If we have a customResolver, attach it to loadOpts
+	// If it has a custom resolver, add it to the load options
 	if customResolver != nil {
 		loadOpts = append(loadOpts, sdkConfig.WithEndpointResolverWithOptions(customResolver))
 	}

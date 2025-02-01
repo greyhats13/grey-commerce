@@ -24,8 +24,7 @@ func CustomErrorHandler(c *fiber.Ctx, err error) error {
 
 	// Example: Log stacktrace if it's a 5xx error
 	if code >= 500 {
-		// For demonstration, printing stacktrace to the console.
-		// You could also log it with your logger if needed.
+		// Log the stack trace
 		debug.PrintStack()
 	}
 
