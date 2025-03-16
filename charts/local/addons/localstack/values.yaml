@@ -21,3 +21,10 @@ ingress:
 # extraEnvVars:
 #   - name: SERVICES
 #     value: "dynamodb,s3"
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 8Gi

@@ -1,4 +1,4 @@
-// Path: grey-user/internal/app/repository/user_repository.go
+// Path: grey-user/internal/app/repository/repository.go
 
 package repository
 
@@ -12,5 +12,5 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user *model.User) error
 	GetUser(ctx context.Context, uuid string) (*model.User, error)
 	DeleteUser(ctx context.Context, uuid string) error
-	ListUsers(ctx context.Context, limit int64, lastKey string) ([]model.User, string, error)
+	ListUsers(ctx context.Context, limit int32, lastKey string) ([]model.User, string, error)
 }

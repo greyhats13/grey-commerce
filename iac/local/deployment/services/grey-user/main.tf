@@ -41,101 +41,70 @@ module "dynamodb_table" {
   source = "terraform-aws-modules/dynamodb-table/aws"
 
   name                = local.svc_naming_standard
-  hash_key            = "UUID"
+  hash_key            = "userId"
   billing_mode        = "PROVISIONED"
   read_capacity       = 5
   write_capacity      = 5
   autoscaling_enabled = false
 
-  # # Configure autoscaling for main table
-  # autoscaling_read = {
-  #   scale_in_cooldown  = 50
-  #   scale_out_cooldown = 40
-  #   target_value       = 75
-  #   max_capacity       = 20
-  #   min_capacity       = 5
-  # }
-
-  # autoscaling_write = {
-  #   scale_in_cooldown  = 50
-  #   scale_out_cooldown = 40
-  #   target_value       = 75
-  #   max_capacity       = 20
-  #   min_capacity       = 5
-  # }
-
   # Definisi Atribut Tabel Utama dan GSIs
   attributes = [
     {
-      name = "UUID"
+      name = "userId"
       type = "S"
     },
     {
-      name = "Email"
+      name = "email"
       type = "S"
     },
     {
-      name = "CreatedAt"
+      name = "shopId"
       type = "S"
     },
     {
-      name = "UpdatedAt"
+      name = "createdAt"
       type = "S"
     },
-
+    {
+      name = "updatedAt"
+      type = "S"
+    },
   ]
 
   # Define Global Secondary Indexes (GSIs)
   global_secondary_indexes = [
     {
       name            = "EmailIndex"
-      hash_key        = "Email"
+      hash_key        = "email"
+      projection_type = "ALL"
+      write_capacity  = 5
+      read_capacity   = 5
+    },
+    {
+      name            = "ShopIdIndex"
+      hash_key        = "shopId"
+      sort_key        = "email"
       projection_type = "ALL"
       write_capacity  = 5
       read_capacity   = 5
     },
     {
       name            = "CreatedAtIndex"
-      hash_key        = "CreatedAt"
-      sort_key        = "Email"
+      hash_key        = "createdAt"
+      sort_key        = "email"
       projection_type = "ALL"
       write_capacity  = 5
       read_capacity   = 5
     },
     {
       name            = "UpdatedAtIndex"
-      hash_key        = "UpdatedAt"
-      sort_key        = "Email"
+      hash_key        = "updatedAt"
+      sort_key        = "email"
       projection_type = "ALL"
       write_capacity  = 5
       read_capacity   = 5
     }
   ]
-
-  # Configure autoscaling for GSIs
-  # autoscaling_indexes = {
-  #   EmailIndex = {
-  #     read_min_capacity  = 5
-  #     read_max_capacity  = 20
-  #     write_min_capacity = 5
-  #     write_max_capacity = 20
-  #     target_value       = 75
-  #   },
-  #   CreatedAtIndex = {
-  #     read_min_capacity  = 5
-  #     read_max_capacity  = 20
-  #     write_min_capacity = 5
-  #     write_max_capacity = 20
-  #     target_value       = 75
-  #   },
-  #   UpdatedAtIndex = {
-  #     read_min_capacity  = 5
-  #     read_max_capacity  = 20
-  #     write_min_capacity = 5
-  #     write_max_capacity = 20
-  #     target_value       = 75
-  #   }
-  # }
 
   # Tagging untuk pengelolaan
   tags = {

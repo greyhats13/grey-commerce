@@ -10,6 +10,7 @@ import (
 	"grey-user/internal/config"
 	"grey-user/internal/middleware"
 	"grey-user/internal/router"
+  "grey-user/pkg/aws/dynamodb"
 	"grey-user/pkg/cache"
 	"grey-user/pkg/databases"
 	"grey-user/pkg/logger"
@@ -18,7 +19,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// This example uses only DynamoDB for the database and Redis for the cache
 func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// Initialize DynamoDB
-	dynamoClient, err := databases.NewDynamoDBClient(cfg)
+	dynamoClient, err := dynamodb.NewDynamoDBClient(cfg)
 	if err != nil {
 		zapLogger.Fatal("failed to create DynamoDB client", err)
 	}
@@ -48,9 +48,13 @@ func main() {
 	// Dependency injection for service
 	userService := service.NewUserService(userRepo, redisCache)
 
+	// Create Fiber with custom JSON encoder/decoder and error handler
 	app := fiber.New(fiber.Config{
 		JSONEncoder: utils.JSONMarshal,
 		JSONDecoder: utils.JSONUnmarshal,
+
+		// Use custom error handler
+		ErrorHandler: middleware.CustomErrorHandler,
 	})
 
 	// Middlewares
